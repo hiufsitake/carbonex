@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0d1f0d">
+    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>CARBONEX | Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        #app-loader { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s, visibility 0.5s; }
+        #app-loader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+        .input-box { border: 2px solid #f1f5f9; padding: 1rem; border-radius: 1.25rem; background: #f8fafc; font-weight: 700; width: 100%; outline: none; transition: all 0.2s; }
+        .input-box:focus { border-color: #2d6a27; background: white; }
+        .nav-card { transition: all 0.2s cubic-bezier(0.4,0,0.2,1); border: 2px solid #f8fafc; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .nav-card:hover { border-color: #2d6a27; transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .hidden-force { display: none !important; }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center justify-center p-6 relative overflow-x-hidden">
+
+    <div id="app-loader">
+        <img src="logo.png" alt="CARBONEX" class="w-48 animate-pulse mb-4" onerror="this.style.display='none'">
+        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading System...</p>
+    </div>
+
+    <div class="w-full max-w-md space-y-10 text-center">
+        <div class="flex flex-col items-center">
+            <img src="logo.png" alt="Carbonex Ventures" class="w-72 md:w-80 h-auto object-contain mb-4" onerror="this.outerHTML='<div class=&quot;text-center mb-4&quot;><h1 class=&quot;text-3xl font-black uppercase text-[#0d1f0d]&quot;>CARBONEX</h1><p class=&quot;text-sm font-black text-[#2d6a27] uppercase tracking-widest&quot;>VENTURES SDN. BHD.</p><p class=&quot;text-xs text-slate-400 mt-1&quot;>碳索未来</p></div>'">
+            <div class="h-1 w-12 bg-[#2d6a27] rounded-full mb-2"></div>
+            <p class="text-[11px] font-black uppercase tracking-[0.5em] text-slate-400">Operations Portal</p>
+        </div>
+
+        <div id="auth-view" class="hidden space-y-6">
+            <div class="space-y-2">
+                <h2 id="auth-title" class="text-xl font-black text-slate-800">Welcome</h2>
+                <p id="auth-subtitle" class="text-xs font-bold text-slate-400">Please login to access the system.</p>
+            </div>
+            <div class="space-y-4">
+                <input type="email" id="email" placeholder="Email Address" class="input-box" required>
+                <input type="password" id="password" placeholder="Password" class="input-box" required>
+                <div id="forgot-link-box" class="text-right">
+                    <button onclick="toggleResetMode()" class="text-[10px] font-bold text-slate-400 hover:text-[#2d6a27] uppercase tracking-widest">Forgot Password?</button>
+                </div>
+            </div>
+            <div class="flex flex-col gap-3">
+                <button onclick="handleAuth()" id="submit-btn" class="w-full bg-[#0d1f0d] text-white font-black p-5 rounded-[2rem] shadow-xl uppercase tracking-widest text-xs hover:bg-[#2d6a27] transition-all">Login</button>
+                <button onclick="toggleAuthMode()" id="toggle-btn" class="w-full bg-white border-2 border-slate-200 text-slate-900 font-black p-5 rounded-[2rem] uppercase tracking-widest text-[10px] hover:border-[#2d6a27] hover:text-[#2d6a27] transition-all shadow-sm">Create New Account</button>
+            </div>
+            <p id="error-msg" class="text-red-500 text-xs font-bold hidden bg-red-50 p-3 rounded-xl"></p>
+        </div>
+
+        <div id="update-password-view" class="hidden space-y-6">
+            <div class="space-y-2">
+                <h2 class="text-xl font-black text-slate-800">Set New Password</h2>
+                <p class="text-xs font-bold text-slate-400">Secure your account with a new password.</p>
+            </div>
+            <input type="password" id="new-password" placeholder="Enter New Password" class="input-box" required>
+            <button onclick="handlePasswordUpdate()" class="w-full bg-[#2d6a27] text-white font-black p-5 rounded-[2rem] shadow-xl uppercase tracking-widest text-xs hover:bg-[#1a4a18] transition-all">Update Password</button>
+            <p id="update-msg" class="text-red-500 text-xs font-bold hidden bg-red-50 p-3 rounded-xl"></p>
+        </div>
+
+        <div id="dashboard-view" class="hidden space-y-6">
+            <div class="grid grid-cols-2 gap-4">
+                <a href="po/index.html" class="nav-card p-5 rounded-[2rem] flex flex-col items-center gap-3 text-center">
+                    <div class="bg-[#2d6a27] text-white p-3 rounded-xl"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div>
+                    <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">PO System</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Purchase Orders</p></div>
+                </a>
+                <a href="cashclaim/index.html" class="nav-card p-5 rounded-[2rem] flex flex-col items-center gap-3 text-center">
+                    <div class="bg-[#1a6b4a] text-white p-3 rounded-xl"><i data-lucide="wallet" class="w-5 h-5"></i></div>
+                    <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">Cash Claim</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Expense Claims</p></div>
+                </a>
+                <a href="staffclaim/index.html" class="nav-card p-5 rounded-[2rem] flex flex-col items-center gap-3 text-center">
+                    <div class="bg-[#4a7a2d] text-white p-3 rounded-xl"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+                    <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">Staff Claim</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Reimbursements</p></div>
+                </a>
+                <a href="leave/index.html" class="nav-card p-5 rounded-[2rem] flex flex-col items-center gap-3 text-center">
+                    <div class="bg-[#1a4a1a] text-white p-3 rounded-xl"><i data-lucide="calendar" class="w-5 h-5"></i></div>
+                    <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">Leave System</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Leave Management</p></div>
+                </a>
+            </div>
+            <button onclick="handleLogout()" class="text-[10px] font-bold text-red-300 hover:text-red-500 uppercase tracking-widest flex items-center justify-center gap-2 mx-auto pt-2">
+                <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
+            </button>
+        </div>
+
+        <footer class="pt-6 pb-10 flex flex-col items-center gap-1 text-center">
+            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-300">CARBONEX VENTURES SDN. BHD.</p>
+            <p class="text-[9px] font-bold text-slate-300">碳索未来</p>
+            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-200">© 2026 ALL RIGHTS RESERVED.</p>
+        </footer>
+    </div>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION — Replace with your Supabase project credentials
+        // See SETUP.md for full setup instructions
+        // ============================================================
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        // ============================================================
+
+        let supabaseClient;
+        try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); }
+        catch (err) { console.error('Supabase Init Error:', err); }
+
+        let isLoginMode = true, isResetMode = false, inactivityTimeout;
+        const INACTIVITY_LIMIT = 10 * 60 * 1000;
+        window.currentAuthEmail = 'Unknown';
+
+        async function initPortal() {
+            const backupTimer = setTimeout(() => {
+                document.getElementById('app-loader').classList.add('fade-out');
+                if (document.getElementById('dashboard-view').classList.contains('hidden')) showAuth();
+            }, 4000);
+            try {
+                const navEntries = window.performance?.getEntriesByType('navigation');
+                if (navEntries?.length > 0 && navEntries[0].type === 'reload') await handleLogout();
+                const { data } = await supabaseClient.auth.getSession();
+                const session = data?.session;
+                const tabActive = sessionStorage.getItem('cbx_tab_session');
+                if (window.location.hash?.includes('type=recovery')) { showUpdatePasswordView(); }
+                else if (session && tabActive) {
+                    window.currentAuthEmail = session.user.email;
+                    showDashboard(); startInactivityTimer();
+                } else {
+                    if (session) await supabaseClient.auth.signOut();
+                    showAuth();
+                }
+            } catch (err) { console.error(err); showAuth(); }
+            finally { clearTimeout(backupTimer); document.getElementById('app-loader').classList.add('fade-out'); }
+        }
+
+        if (supabaseClient) {
+            supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'PASSWORD_RECOVERY') { showUpdatePasswordView(); return; }
+                if (event === 'SIGNED_IN' && sessionStorage.getItem('cbx_tab_session')) {
+                    if (session?.user) window.currentAuthEmail = session.user.email;
+                    showDashboard(); startInactivityTimer();
+                } else if (event === 'SIGNED_OUT') {
+                    stopInactivityTimer(); sessionStorage.removeItem('cbx_tab_session'); showAuth();
+                }
+            });
+        }
+
+        function startInactivityTimer() {
+            clearTimeout(inactivityTimeout);
+            ['click','keypress','mousemove','touchstart'].forEach(e => document.addEventListener(e, resetInactivityTimer));
+            inactivityTimeout = setTimeout(handleLogout, INACTIVITY_LIMIT);
+        }
+        function resetInactivityTimer() { clearTimeout(inactivityTimeout); inactivityTimeout = setTimeout(handleLogout, INACTIVITY_LIMIT); }
+        function stopInactivityTimer() { clearTimeout(inactivityTimeout); ['click','keypress','mousemove','touchstart'].forEach(e => document.removeEventListener(e, resetInactivityTimer)); }
+
+        function showDashboard() { hideAllViews(); document.getElementById('dashboard-view').classList.remove('hidden'); lucide.createIcons(); }
+        function showAuth() { hideAllViews(); document.getElementById('auth-view').classList.remove('hidden'); if (isResetMode) toggleResetMode(); lucide.createIcons(); }
+        function showUpdatePasswordView() { hideAllViews(); document.getElementById('update-password-view').classList.remove('hidden'); }
+        function hideAllViews() { ['auth-view','dashboard-view','update-password-view'].forEach(id => document.getElementById(id).classList.add('hidden')); }
+
+        async function handleAuth() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('submit-btn');
+            const errorMsg = document.getElementById('error-msg');
+            if (!email) { errorMsg.innerText = 'Please enter your email.'; errorMsg.classList.remove('hidden'); return; }
+            if (!isResetMode && !password) { errorMsg.innerText = 'Please enter your password.'; errorMsg.classList.remove('hidden'); return; }
+            btn.innerHTML = '<span class="animate-pulse">Processing...</span>';
+            errorMsg.classList.add('hidden');
+            if (isResetMode) {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+                if (error) { errorMsg.innerText = error.message; errorMsg.classList.remove('hidden'); btn.innerText = 'Send Reset Link'; }
+                else { alert('Reset link sent! Check your email.'); toggleResetMode(); }
+                return;
+            }
+            if (isLoginMode) {
+                sessionStorage.setItem('cbx_tab_session', 'true');
+                const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) { sessionStorage.removeItem('cbx_tab_session'); errorMsg.innerText = error.message; errorMsg.classList.remove('hidden'); btn.innerText = 'Login'; }
+            } else {
+                const { error } = await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: window.location.href } });
+                if (error) { errorMsg.innerText = error.message; errorMsg.classList.remove('hidden'); btn.innerText = 'Sign Up'; }
+                else { alert('Account created! Check your email to confirm.'); toggleAuthMode(); btn.innerText = 'Login'; }
+            }
+        }
+
+        function toggleResetMode() { isResetMode = !isResetMode; isLoginMode = true; updateAuthUI(); }
+        function toggleAuthMode() { if (isResetMode) { toggleResetMode(); return; } isLoginMode = !isLoginMode; updateAuthUI(); }
+        function updateAuthUI() {
+            const isR = isResetMode, isL = isLoginMode;
+            document.getElementById('error-msg').classList.add('hidden');
+            document.getElementById('auth-title').innerText = isR ? 'Reset Password' : isL ? 'Welcome' : 'Register';
+            document.getElementById('auth-subtitle').innerText = isR ? 'Enter your email to receive a reset link.' : isL ? 'Please login to access the system.' : 'Create your account.';
+            document.getElementById('submit-btn').innerText = isR ? 'Send Reset Link' : isL ? 'Login' : 'Sign Up';
+            document.getElementById('toggle-btn').innerText = isR ? 'Back to Login' : isL ? 'Create New Account' : 'Back to Login';
+            document.getElementById('password').classList.toggle('hidden-force', isR);
+            document.getElementById('forgot-link-box').classList.toggle('hidden-force', isR || !isL);
+        }
+
+        async function handlePasswordUpdate() {
+            const newPass = document.getElementById('new-password').value;
+            if (!newPass) return alert('Please enter a password.');
+            const { error } = await supabaseClient.auth.updateUser({ password: newPass });
+            if (!error) { alert('Password updated!'); sessionStorage.setItem('cbx_tab_session', 'true'); window.location.href = window.location.pathname; }
+            else { alert(error.message); }
+        }
+
+        async function handleLogout() {
+            stopInactivityTimer();
+            sessionStorage.removeItem('cbx_tab_session');
+            localStorage.clear();
+            if (supabaseClient) await supabaseClient.auth.signOut();
+            window.location.href = window.location.pathname;
+        }
+
+        document.getElementById('password').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAuth(); });
+        lucide.createIcons();
+        window.onload = initPortal;
+    </script>
+</body>
+</html>
