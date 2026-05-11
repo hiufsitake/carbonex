@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0d1f0d">
+    <link rel="apple-touch-icon" href="../logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../logo.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>CARBONEX | PO System</title>
+    <script>
+        document.documentElement.style.display = 'none';
+        const GUARD_URL = 'YOUR_SUPABASE_URL';
+        const GUARD_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const guardClient = supabase.createClient(GUARD_URL, GUARD_KEY);
+        async function checkSession() {
+            const { data: { session } } = await guardClient.auth.getSession();
+            if (!session) window.location.href = '../index.html';
+            else document.documentElement.style.display = '';
+        }
+        checkSession();
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .input-box { border: 2px solid #f1f5f9; padding: 1rem; border-radius: 1.25rem; background: #f8fafc; font-weight: 700; width: 100%; outline: none; transition: all 0.2s; }
+        .input-box:focus { border-color: #2d6a27; background: white; }
+        .tab-active { background: #2d6a27; color: white; box-shadow: 0 10px 15px -3px rgba(45,106,39,0.3); }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-approved { background: #dcfce7; color: #166534; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .status-draft { background: #e0e7ff; color: #3730a3; }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen pb-24 text-slate-900 font-medium">
+
+    <nav class="bg-[#0d1f0d] text-white p-5 sticky top-0 z-50 shadow-xl border-b-2 border-[#2d6a27]">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html" class="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></a>
+                <div>
+                    <h1 class="font-black italic text-base uppercase tracking-tighter leading-none">CARBONEX <span class="text-[#4a9e3f] text-xs">PO System</span></h1>
+                    <p class="text-[8px] text-slate-500 uppercase tracking-widest">Purchase Order Management</p>
+                </div>
+            </div>
+            <div class="flex bg-slate-800 p-1 rounded-xl gap-1 overflow-x-auto">
+                <button onclick="switchTab('create')" id="nav-create" class="px-3 py-2 rounded-lg text-[9px] font-bold tab-active uppercase transition-all">Create</button>
+                <button onclick="switchTab('review')" id="nav-review" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all">Review</button>
+                <button onclick="switchTab('history')" id="nav-history" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all">Archive</button>
+                <button onclick="switchTab('admin')" id="nav-admin" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all">Admin</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto p-4 mt-6">
+        <div id="auth-lock-screen" class="hidden p-10 text-center bg-white rounded-[2.5rem] border shadow-sm space-y-4">
+            <i data-lucide="shield-off" class="w-12 h-12 mx-auto text-red-400"></i>
+            <h3 class="font-black text-lg uppercase italic text-slate-800">Access Restricted</h3>
+            <p class="text-xs text-slate-500">This section requires administrator access.</p>
+        </div>
+
+        <div id="tab-create">
+            <form id="po-form" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-3">
+                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">PO Details</h2>
+                        <input type="text" id="po-number" class="input-box bg-slate-100 text-slate-500 font-black" readonly placeholder="Auto-generated">
+                        <input type="date" id="po-date" class="input-box" required>
+                        <select id="po-category" class="input-box text-[#2d6a27] font-bold">
+                            <option value="Materials">Materials &amp; Equipment</option>
+                            <option value="Services">Professional Services</option>
+                            <option value="Utilities">Utilities</option>
+                            <option value="Operations">Operations</option>
+                            <option value="Carbon Credits">Carbon Credits</option>
+                            <option value="Others">Others</option>
+                        </select>
+                    </section>
+                    <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-3">
+                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">Supplier Info</h2>
+                        <input type="text" id="supplier-name" placeholder="Supplier / Vendor Name" class="input-box" required>
+                        <input type="text" id="supplier-contact" placeholder="Contact Person" class="input-box">
+                        <input type="text" id="supplier-tel" placeholder="Telephone / Email" class="input-box">
+                        <input type="text" id="project-ref" placeholder="Project / Reference No." class="input-box">
+                    </section>
+                </div>
+
+                <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">Line Items</h2>
+                        <button type="button" onclick="addItemRow()" class="bg-[#f0f7ee] text-[#2d6a27] px-4 py-2 rounded-xl font-black text-[10px] uppercase flex items-center gap-1 shadow-sm hover:bg-[#2d6a27] hover:text-white transition-all"><i data-lucide="plus-circle" class="w-3 h-3"></i> Add Item</button>
+                    </div>
+                    <div id="items-list" class="space-y-3"></div>
+                    <div class="flex justify-end pt-2 border-t border-slate-100">
+                        <div class="text-right space-y-1">
+                            <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest">TOTAL AMOUNT</p>
+                            <p id="total-display" class="text-2xl font-black text-[#0d1f0d]">RM 0.00</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-3">
+                    <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">Delivery &amp; Remarks</h2>
+                    <textarea id="delivery-address" placeholder="Delivery Address" class="input-box" rows="2"></textarea>
+                    <textarea id="remarks" placeholder="Special Instructions / Remarks" class="input-box" rows="2"></textarea>
+                </section>
+
+                <div class="flex gap-3">
+                    <button type="button" onclick="previewPDF()" class="w-1/3 bg-[#f0f7ee] text-[#2d6a27] border border-[#c6e0c0] font-black p-6 rounded-[2.5rem] shadow-sm uppercase tracking-widest text-[10px] italic flex flex-col md:flex-row items-center justify-center gap-2 hover:bg-[#2d6a27] hover:text-white transition-all">
+                        <i data-lucide="eye" class="w-5 h-5"></i> Preview
+                    </button>
+                    <button type="submit" id="submit-btn" class="w-2/3 bg-[#0d1f0d] text-white font-black p-6 rounded-[2.5rem] shadow-xl uppercase tracking-widest text-xs italic flex flex-col md:flex-row items-center justify-center gap-3 hover:bg-[#2d6a27] transition-all">
+                        <i data-lucide="send" class="w-5 h-5"></i> <span id="submit-text">Submit PO</span>
+                    </button>
+                </div>
+
+                <button type="button" onclick="saveDraft()" class="w-full bg-indigo-50 text-indigo-600 border border-indigo-100 font-black p-4 rounded-[2.5rem] shadow-sm uppercase tracking-widest text-[10px] italic flex items-center justify-center gap-2 hover:bg-indigo-100 transition-all">
+                    <i data-lucide="file-edit" class="w-4 h-4"></i> Save as Draft
+                </button>
+                <button type="button" onclick="cancelEdit()" id="cancel-edit-btn" class="hidden w-full border-2 border-slate-200 text-slate-400 font-black p-4 rounded-[2.5rem] uppercase tracking-widest text-[10px] italic">Cancel Editing</button>
+            </form>
+        </div>
+
+        <div id="tab-review" class="hidden"><div id="review-list" class="space-y-4"></div></div>
+        <div id="tab-history" class="hidden space-y-4">
+            <input type="text" id="search-box" placeholder="Search PO No or Supplier..." oninput="renderHistory()" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#2d6a27]">
+            <div id="history-list" class="space-y-3"></div>
+        </div>
+        <div id="tab-admin" class="hidden">
+            <section class="bg-white p-8 rounded-[2.5rem] border shadow-sm space-y-6 text-center">
+                <i data-lucide="settings" class="w-12 h-12 mx-auto text-[#2d6a27]"></i>
+                <h2 class="font-black uppercase text-xs tracking-widest text-slate-500">Admin Tools</h2>
+                <button onclick="exportCSV()" class="w-full bg-[#0d1f0d] text-white p-5 rounded-3xl font-black uppercase text-xs tracking-widest shadow-lg flex items-center justify-center gap-3 hover:bg-[#2d6a27] transition-all"><i data-lucide="download" class="w-5 h-5"></i> Export All POs (CSV)</button>
+            </section>
+        </div>
+
+        <footer class="text-center py-6 mt-6">
+            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-300">CARBONEX VENTURES SDN. BHD. &nbsp;|&nbsp; 碳索未来</p>
+            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-200">&copy; 2026 ALL RIGHTS RESERVED.</p>
+        </footer>
+    </main>
+
+    <script>
+        // ============================================================
+        // CONFIGURATION — Replace with your credentials
+        // ============================================================
+        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
+        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
+        const EMAIL_SERVICE  = 'YOUR_EMAILJS_SERVICE_ID';
+        const EMAIL_TEMPLATE = 'YOUR_EMAILJS_TEMPLATE_ID';
+        const EMAIL_KEY      = 'YOUR_EMAILJS_PUBLIC_KEY';
+        const ADMIN_EMAILS   = ['admin@carbonexventures.com'];  // add actual admin emails
+        const APPROVER_MAP   = { 'admin@carbonexventures.com': 'ADMIN' }; // email -> initials
+        const CO = {
+            name: 'CARBONEX VENTURES SDN. BHD.',
+            reg:  'YOUR_REG_NUMBER',
+            email:'admin@carbonexventures.com',
+            address: 'YOUR_COMPANY_ADDRESS',
+            tel:  'YOUR_TELEPHONE'
+        };
+        // ============================================================
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const formatRM = n => parseFloat(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
+        const mkRow = (l,v) => `<tr><td style="padding:6px 0;color:#64748b;font-size:11px;font-weight:700">${l}</td><td style="padding:6px 0;color:#0f172a;font-size:13px;font-weight:700;text-align:right">${v}</td></tr>`;
+
+        let currentPOs=[], isAuthorized=false, editingId=null, currentApproverInitials='';
+
+        let inactivityTimeout;
+        function resetIT(){clearTimeout(inactivityTimeout);inactivityTimeout=setTimeout(async()=>{await supabaseClient.auth.signOut();window.location.href='../index.html';},900000);}
+        ['mousemove','keypress','click','scroll','touchstart'].forEach(e=>document.addEventListener(e,resetIT));
+        resetIT();
+
+        async function init(){
+            emailjs.init(EMAIL_KEY);
+            const {data:{session}}=await supabaseClient.auth.getSession();
+            if(session&&ADMIN_EMAILS.includes(session.user.email))isAuthorized=true;
+            if(session?.user)currentApproverInitials=APPROVER_MAP[session.user.email]||session.user.email.split('@')[0].toUpperCase().substring(0,3);
+            addItemRow();
+            await setAutoPONumber();
+            lucide.createIcons();
+        }
+
+        async function setAutoPONumber(){
+            if(editingId)return;
+            const now=new Date();
+            const ds=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}`;
+            const {count}=await supabaseClient.from('po_logs').select('*',{count:'exact',head:true}).gte('created_at',`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-01`);
+            document.getElementById('po-number').value=`CBX-PO-${ds}-${String((count||0)+1).padStart(2,'0')}`;
+            document.getElementById('po-date').value=now.toISOString().split('T')[0];
+        }
+
+        function addItemRow(desc='',qty='',price=''){
+            const container=document.getElementById('items-list');
+            const div=document.createElement('div');
+            div.className='item-row grid grid-cols-12 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 items-center';
+            div.innerHTML=`<input type="text" placeholder="Description" value="${desc}" class="col-span-6 bg-transparent font-bold text-[11px] outline-none" required>
+                <input type="number" placeholder="Qty" value="${qty}" min="0" class="col-span-2 bg-transparent font-bold text-[11px] outline-none text-center" oninput="updateTotal()" required>
+                <input type="number" step="0.01" placeholder="Unit Price" value="${price}" class="col-span-3 bg-transparent font-bold text-[11px] outline-none text-right" oninput="updateTotal()" required>
+                <button type="button" onclick="this.parentElement.remove();updateTotal();" class="col-span-1 text-red-300 hover:text-red-600 flex justify-center"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`;
+            container.appendChild(div);lucide.createIcons();updateTotal();
+        }
+
+        function updateTotal(){
+            let t=0;
+            document.querySelectorAll('.item-row').forEach(r=>{const f=r.querySelectorAll('input');t+=(parseFloat(f[1].value)||0)*(parseFloat(f[2].value)||0);});
+            document.getElementById('total-display').innerText='RM '+formatRM(t);
+        }
+
+        function getFormData(){
+            const items=[];let total=0;
+            document.querySelectorAll('.item-row').forEach(r=>{const f=r.querySelectorAll('input');const q=parseFloat(f[1].value)||0,p=parseFloat(f[2].value)||0;total+=q*p;items.push({description:f[0].value,qty:q,unit_price:p,total:q*p});});
+            return{
+                po_number:document.getElementById('po-number').value,
+                date:document.getElementById('po-date').value,
+                category:document.getElementById('po-category').value,
+                supplier_name:document.getElementById('supplier-name').value,
+                supplier_contact:document.getElementById('supplier-contact').value,
+                supplier_tel:document.getElementById('supplier-tel').value,
+                project_ref:document.getElementById('project-ref').value,
+                delivery_address:document.getElementById('delivery-address').value,
+                remarks:document.getElementById('remarks').value,
+                items,total,status:'Pending'
+            };
+        }
+
+        function switchTab(tab){
+            const priv=['review','admin'];
+            if(priv.includes(tab)&&!isAuthorized){
+                document.querySelectorAll('main>div').forEach(d=>d.classList.add('hidden'));
+                document.getElementById('auth-lock-screen').classList.remove('hidden');
+            }else{
+                document.getElementById('auth-lock-screen').classList.add('hidden');
+                document.querySelectorAll('main>div').forEach(d=>d.classList.toggle('hidden',d.id!=='tab-'+tab));
+                if(['review','history','admin'].includes(tab))fetchRecords();
+            }
+            document.querySelectorAll('nav button').forEach(b=>{
+                b.className=`px-3 py-2 rounded-lg text-[9px] font-bold uppercase transition-all ${b.id==='nav-'+tab?'tab-active':'text-slate-400'}`;
+            });
+            lucide.createIcons();
+        }
+
+        async function fetchRecords(){
+            const{data}=await supabaseClient.from('po_logs').select('*').order('created_at',{ascending:false});
+            currentPOs=data||[];
+            renderReview();renderHistory();
+        }
+
+        function renderReview(){
+            document.getElementById('review-list').innerHTML=currentPOs.filter(p=>p.status==='Pending').map(po=>`
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-[9px] font-bold text-[#2d6a27] uppercase tracking-widest italic">${po.category||'General'}</p>
+                            <h3 class="font-black text-lg text-slate-900 uppercase">${po.po_number}</h3>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase">${po.supplier_name}</p>
+                            ${po.project_ref?`<p class="text-[9px] font-bold text-slate-400">Ref: ${po.project_ref}</p>`:''}
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[9px] font-bold text-slate-400 uppercase">Total</p>
+                            <p class="text-2xl font-black text-slate-900 leading-none">RM ${formatRM(po.total)}</p>
+                            <button onclick="generatePDF('${po.id}')" class="mt-2 bg-[#f0f7ee] text-[#2d6a27] px-3 py-1.5 rounded-full font-bold text-[9px] uppercase flex items-center gap-1 ml-auto hover:bg-[#2d6a27] hover:text-white transition-all"><i data-lucide="eye" class="w-3 h-3"></i> View PDF</button>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 px-4 py-2 rounded-xl text-[10px] font-bold text-slate-500 text-center uppercase tracking-widest">Action as <span class="text-[#2d6a27]">${currentApproverInitials||'&mdash;'}</span></div>
+                    <div class="flex gap-3">
+                        <button onclick="handleStatusChange('${po.id}','Approved')" class="flex-1 bg-[#2d6a27] text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-[#1a4a18] transition-all">Approve</button>
+                        <button onclick="handleStatusChange('${po.id}','Rejected')" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-600 transition-all">Reject</button>
+                    </div>
+                </div>`).join('')||'<div class="text-center p-10 text-slate-300 italic text-xs">Queue Clear &mdash; No Pending POs</div>';
+            lucide.createIcons();
+        }
+
+        function renderHistory(){
+            const q=(document.getElementById('search-box')?.value||'').toLowerCase();
+            const filtered=currentPOs.filter(p=>!q||p.po_number?.toLowerCase().includes(q)||p.supplier_name?.toLowerCase().includes(q));
+            document.getElementById('history-list').innerHTML=filtered.map(po=>`
+                <div class="bg-white p-5 rounded-[2rem] border shadow-sm flex justify-between items-center gap-2">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-black text-slate-800 text-sm tracking-tight">${po.po_number}</h3>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate">${po.supplier_name} &nbsp;|&nbsp; RM ${formatRM(po.total)}</p>
+                        <p class="text-[9px] font-bold text-slate-300">${po.date||''}</p>
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <span class="status-${po.status.toLowerCase()} px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">${po.status}</span>
+                        <button onclick="generatePDF('${po.id}')" class="p-2.5 bg-[#f0f7ee] text-[#2d6a27] rounded-xl hover:bg-[#2d6a27] hover:text-white transition-all"><i data-lucide="printer" class="w-4 h-4"></i></button>
+                        ${(po.status==='Rejected'||po.status==='Draft')?`<button onclick="loadForEdit('${po.id}')" class="p-2.5 bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="edit-3" class="w-4 h-4"></i></button>`:''}
+                        ${isAuthorized?`<button onclick="deletePO('${po.id}')" class="p-2.5 bg-red-50 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}
+                    </div>
+                </div>`).join('')||'<div class="text-center p-10 text-slate-300 italic text-xs">No records found.</div>';
+            lucide.createIcons();
+        }
+
+        async function handleStatusChange(id,newStatus){
+            if(!currentApproverInitials){alert('Your account is not mapped to an approver. Contact admin.');return;}
+            const po=currentPOs.find(p=>p.id===id);
+            const{error}=await supabaseClient.from('po_logs').update({status:newStatus,approved_by:currentApproverInitials,approved_at:new Date().toISOString()}).eq('id',id);
+            if(error){alert('Error: '+error.message);return;}
+            if(po){emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{system_name:'CARBONEX PO SYSTEM',header_bg:newStatus==='Approved'?'#2d6a27':'#ef4444',title:`PO ${newStatus}`,html_body:mkRow('PO No',po.po_number)+mkRow('Supplier',po.supplier_name)+mkRow('Total','RM '+formatRM(po.total))+mkRow('Action By',currentApproverInitials),remark_text:newStatus==='Approved'?'Purchase Order approved. Please proceed.':'Purchase Order rejected. Please resubmit.'});}
+            fetchRecords();
+        }
+
+        function loadForEdit(id){
+            const po=currentPOs.find(p=>p.id===id);if(!po)return;
+            editingId=id;
+            document.getElementById('po-number').value=po.po_number;
+            document.getElementById('po-date').value=po.date;
+            document.getElementById('po-category').value=po.category||'Others';
+            document.getElementById('supplier-name').value=po.supplier_name;
+            document.getElementById('supplier-contact').value=po.supplier_contact||'';
+            document.getElementById('supplier-tel').value=po.supplier_tel||'';
+            document.getElementById('project-ref').value=po.project_ref||'';
+            document.getElementById('delivery-address').value=po.delivery_address||'';
+            document.getElementById('remarks').value=po.remarks||'';
+            document.getElementById('items-list').innerHTML='';
+            (po.items||[]).forEach(i=>addItemRow(i.description,i.qty,i.unit_price));
+            document.getElementById('submit-text').innerText='Update & Resubmit';
+            document.getElementById('cancel-edit-btn').classList.remove('hidden');
+            switchTab('create');window.scrollTo({top:0,behavior:'smooth'});
+        }
+
+        function cancelEdit(){
+            editingId=null;
+            document.getElementById('po-form').reset();
+            document.getElementById('items-list').innerHTML='';
+            document.getElementById('submit-text').innerText='Submit PO';
+            document.getElementById('cancel-edit-btn').classList.add('hidden');
+            addItemRow();setAutoPONumber();lucide.createIcons();
+        }
+
+        async function deletePO(id){
+            if(!isAuthorized){alert('Admin access required.');return;}
+            if(confirm('Delete this PO record? This cannot be undone.')){
+                await supabaseClient.from('po_logs').delete().eq('id',id);fetchRecords();
+            }
+        }
+
+        async function saveDraft(){
+            const payload={...getFormData(),status:'Draft'};
+            let res;
+            if(editingId)res=await supabaseClient.from('po_logs').update(payload).eq('id',editingId);
+            else res=await supabaseClient.from('po_logs').insert(payload);
+            if(!res.error){alert('Draft saved.');cancelEdit();}else alert('Error: '+res.error.message);
+        }
+
+        function buildPDF(poNo,date,supplier,contact,tel,projectRef,deliveryAddr,remarks,items,total,status,approvedBy,approvedAt,save=true){
+            const{jsPDF}=window.jspdf;
+            const doc=new jsPDF();
+            doc.setFont('helvetica','bold').setFontSize(14).text(CO.name,105,20,{align:'center'});
+            doc.setFontSize(8).setFont('helvetica','normal');
+            if(CO.reg&&CO.reg!=='YOUR_REG_NUMBER')doc.text('Reg: '+CO.reg,105,26,{align:'center'});
+            const addr=doc.splitTextToSize(CO.address,180);
+            doc.text(addr,105,30,{align:'center'});
+            let y=30+addr.length*4;
+            doc.text('Tel: '+CO.tel+' | Email: '+CO.email,105,y+2,{align:'center'});
+            doc.setDrawColor(45,106,39).setLineWidth(0.5).line(14,y+6,196,y+6);
+            doc.setFontSize(13).setFont('helvetica','bold').text('PURCHASE ORDER',105,y+14,{align:'center'});
+            doc.setFontSize(9).setFont('helvetica','normal');
+            doc.text('PO No: '+poNo,14,y+22);
+            doc.text('Date: '+(date?new Date(date).toLocaleDateString('en-GB'):'-'),140,y+22);
+            doc.text('Supplier: '+supplier,14,y+28);
+            if(contact)doc.text('Contact: '+contact,14,y+33);
+            if(tel)doc.text('Tel/Email: '+tel,14,y+38);
+            if(projectRef)doc.text('Project Ref: '+projectRef,140,y+28);
+            doc.autoTable({
+                startY:y+44,
+                head:[['No.','Description','Qty','Unit Price (RM)','Total (RM)']],
+                body:items.map((i,idx)=>[idx+1,i.description,i.qty,formatRM(i.unit_price),formatRM(i.total)]),
+                theme:'grid',
+                headStyles:{fillColor:[13,31,13]},
+                styles:{fontSize:8},
+                columnStyles:{3:{halign:'right'},4:{halign:'right'}}
+            });
+            const finalY=doc.lastAutoTable.finalY;
+            doc.setFont('helvetica','bold').setFontSize(10).text('TOTAL: RM '+formatRM(total),196,finalY+10,{align:'right'});
+            if(deliveryAddr){doc.setFont('helvetica','normal').setFontSize(8);doc.text('Delivery: '+deliveryAddr,14,finalY+18);}
+            if(remarks)doc.text('Remarks: '+remarks,14,finalY+24);
+            if(status==='PREVIEW'){doc.setTextColor(45,106,39);doc.setFontSize(11).text('PREVIEW — NOT SUBMITTED',196,finalY+32,{align:'right'});doc.setTextColor(0,0,0);}
+            else if(status==='Approved'&&approvedBy){const dt=approvedAt?new Date(approvedAt).toLocaleString('en-GB'):'-';doc.setFontSize(8).setFont('helvetica','italic').text(`Digitally approved by ${approvedBy} on ${dt}. No signature required.`,14,finalY+32);}
+            if(save)doc.save(poNo+'.pdf');else window.open(URL.createObjectURL(doc.output('blob')));
+        }
+
+        function generatePDF(id){
+            const po=currentPOs.find(p=>p.id===id);if(!po)return;
+            buildPDF(po.po_number,po.date,po.supplier_name,po.supplier_contact,po.supplier_tel,po.project_ref,po.delivery_address,po.remarks,po.items||[],po.total,po.status,po.approved_by,po.approved_at,true);
+        }
+
+        function previewPDF(){
+            const items=[];document.querySelectorAll('.item-row').forEach(r=>{const f=r.querySelectorAll('input');const q=parseFloat(f[1].value)||0,p=parseFloat(f[2].value)||0;if(f[0].value||q)items.push({description:f[0].value,qty:q,unit_price:p,total:q*p});});
+            if(!items.length){alert('Please add at least one item.');return;}
+            let total=items.reduce((s,i)=>s+i.total,0);
+            buildPDF(
+                document.getElementById('po-number').value||'DRAFT',
+                document.getElementById('po-date').value,
+                document.getElementById('supplier-name').value||'-',
+                document.getElementById('supplier-contact').value,
+                document.getElementById('supplier-tel').value,
+                document.getElementById('project-ref').value,
+                document.getElementById('delivery-address').value,
+                document.getElementById('remarks').value,
+                items,total,'PREVIEW',null,null,false
+            );
+        }
+
+        async function exportCSV(){
+            if(!isAuthorized){alert('Admin access required.');return;}
+            const{data}=await supabaseClient.from('po_logs').select('*').order('created_at',{ascending:false});
+            const rows=['PO No,Date,Category,Supplier,Project Ref,Total (RM),Status,Approved By'];
+            (data||[]).forEach(po=>rows.push([po.po_number,po.date,po.category,`"${po.supplier_name}"`,`"${po.project_ref||''}"`,parseFloat(po.total||0).toFixed(2),po.status,po.approved_by||''].join(',')));
+            const a=document.createElement('a');
+            a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));
+            a.download='CARBONEX_PO.csv';a.click();
+        }
+
+        document.getElementById('po-form').onsubmit=async function(e){
+            e.preventDefault();
+            const payload=getFormData();
+            let res;
+            if(editingId)res=await supabaseClient.from('po_logs').update(payload).eq('id',editingId);
+            else res=await supabaseClient.from('po_logs').insert(payload);
+            if(!res.error){
+                emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{system_name:'CARBONEX PO SYSTEM',header_bg:'#0d1f0d',title:editingId?'PO Resubmitted':'New Purchase Order',html_body:mkRow('PO No',payload.po_number)+mkRow('Supplier',payload.supplier_name)+mkRow('Total','RM '+formatRM(payload.total)),remark_text:'Please review via CARBONEX Portal.'});
+                alert(editingId?'PO Updated & Resubmitted.':'PO Submitted Successfully.');cancelEdit();
+                if(isAuthorized)fetchRecords();
+            }else alert('Error: '+res.error.message);
+        };
+
+        init();
+    </script>
+</body>
+</html>

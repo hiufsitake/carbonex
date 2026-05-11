@@ -1,0 +1,9 @@
+{
+  "name": "CARBONEX Portal",
+  "short_name": "CARBONEX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d1f0d",
+  "icons": [{"src": "logo.png", "sizes": "any", "type": "image/png"}]
+}
