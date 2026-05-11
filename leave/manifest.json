@@ -1,0 +1,9 @@
+{
+  "name": "CARBONEX Leave System",
+  "short_name": "CBX Leave",
+  "start_url": "/leave/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0d1f0d",
+  "icons": [{"src": "../logo.png", "sizes": "any", "type": "image/png"}]
+}
