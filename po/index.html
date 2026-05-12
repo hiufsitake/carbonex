@@ -87,13 +87,14 @@
         .status-rejected { background: #fee2e2; color: #991b1b; }
         .status-draft    { background: #e0e7ff; color: #3730a3; }
 
-        /* Custom Scrollbar for items */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="min-h-screen pb-24 text-slate-900">
+
+    <img id="pdf-logo" src="../logo.png" style="display:none;" crossorigin="anonymous">
 
     <nav class="bg-white p-5 sticky top-0 z-50 shadow-sm border-b border-slate-100">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
@@ -258,10 +259,10 @@
         
         const CO = {
             name: 'CARBONEX VENTURES SDN. BHD.',
-            reg:  '1556985-T', 
-            email:'admin@carbonexventures.com',
-            address: 'Lot 123, Block 4, MCLD, Miri, Sarawak',
-            tel:  '+6012-3456789'
+            reg:  '202601013376 (1675474-X)', 
+            email:'carbonexventures2026@gmail.com',
+            address: 'UNIT 906-3-04, SOON HUP TOWER (2ND FLOOR), JALAN MAJU, 98000 MIRI, SARAWAK',
+            tel:  '084309048'
         };
 
         // ============================================================
@@ -301,7 +302,6 @@
             
             if (session?.user) {
                 currentApproverInitials = APPROVER_MAP[session.user.email] || session.user.email.split('@')[0].toUpperCase().substring(0, 3);
-                // Auto fill requestor details matching ITAKE layout requirements
                 if (session.user.email === 'hiu.fs.itake@gmail.com') {
                     document.getElementById('req-name').value = 'Hiu Fu Shun';
                 } else {
@@ -705,7 +705,6 @@
             document.getElementById('submit-text').innerText = 'Submit For Review';
             document.getElementById('cancel-edit-btn').classList.add('hidden');
             
-            // Re-populate user specifics after form reset
             if (window.currentUserEmail) {
                  if (window.currentUserEmail === 'hiu.fs.itake@gmail.com') {
                     document.getElementById('req-name').value = 'Hiu Fu Shun';
@@ -727,6 +726,11 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
+            const logoEl = document.getElementById('pdf-logo');
+            if (logoEl && logoEl.complete && logoEl.naturalWidth !== 0) {
+                doc.addImage(logoEl, 'PNG', 14, 12, 20, 20);
+            }
+
             doc.setFont('helvetica', 'bold').setFontSize(15).text(CO.name, 105, 20, { align: 'center' });
             doc.setFontSize(8).setFont('helvetica', 'normal');
             
@@ -769,7 +773,7 @@
             let noteY = finalY + 20;
             
             if (deliveryAddr) {
-                const delLines = doc.splitTextToSize(`Delivery to: ${deliveryAddr}`, 120);
+                const delLines = doc.splitTextToSize(`${deliveryAddr}`, 120);
                 doc.text(delLines, 14, noteY);
                 noteY += (delLines.length * 4) + 2;
             }
