@@ -10,8 +10,8 @@
     
     <title>CARBONEX | PO System</title>
     
-    <link rel="apple-touch-icon" href="../logo.jpg">
-    <link rel="icon" href="../logo.jpg" type="image/jpeg">
+    <link rel="apple-touch-icon" href="../letterhead.jpg">
+    <link rel="icon" href="../letterhead.jpg" type="image/jpeg">
     <link rel="manifest" href="manifest.json">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -94,7 +94,7 @@
 </head>
 <body class="min-h-screen pb-24 text-slate-900">
 
-    <img id="pdf-logo" src="../logo.jpg" style="display:none;">
+    <img id="pdf-logo" src="../carbonex letterhead.jpg" style="display:none;" crossorigin="anonymous">
 
     <nav class="bg-white p-5 sticky top-0 z-50 shadow-sm border-b border-slate-100">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
@@ -144,7 +144,7 @@
                     <section class="bg-white p-6 rounded-[2rem] shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] border border-slate-100/50 flex flex-col space-y-4">
                         <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 mb-2">SUPPLIER DETAILS</h2>
                         <input type="text" id="supplier-name" placeholder="Supplier / Contractor Name" class="input-box" required>
-                        <textarea id="delivery-address" placeholder="Full Supplier Address (e.g. NO. 62A, LORONG 1...)" class="input-box flex-1 min-h-[80px] resize-none"></textarea>
+                        <textarea id="delivery-address" placeholder="Full Supplier Address (e.g. NO. 62A, LORONG 1, JALAN TAPAH...)" class="input-box flex-1 min-h-[80px] resize-none"></textarea>
                         <input type="text" id="supplier-contact" placeholder="Contact Person (Attn)" class="input-box">
                         <input type="text" id="supplier-tel" placeholder="Telephone / Email" class="input-box">
                     </section>
@@ -704,13 +704,16 @@
         }
 
         // ============================================================
-        // EXPORTS (PDF / CSV) - WITH REDESIGNED HEADER & LAYOUT
+        // EXPORTS (PDF / CSV) - WITH FULL WIDTH LETTERHEAD & TOP ADDRESS
         // ============================================================
         function buildPDF(poNo, date, supplier, contact, tel, projectRef, supplierAddress, remarks, items, total, status, approvedBy, approvedAt, isSaveAction = true) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            // 1. Render Logo (Bypasses tainted canvas limitations if loaded from same origin)
+            let currentY = 15;
+            let headerRendered = false;
+
+            // 1. Render Letterhead
             const logoEl = document.getElementById('pdf-logo');
             if (logoEl && logoEl.complete && logoEl.naturalWidth !== 0) {
                 try {
@@ -719,61 +722,67 @@
                     canvas.height = logoEl.naturalHeight;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(logoEl, 0, 0);
-                    const dataUrl = canvas.toDataURL('image/jpeg');
-                    doc.addImage(dataUrl, 'JPEG', 14, 14, 24, 24);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
+                    
+                    const imgWidth = 182; // A4 Width minus margins
+                    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                    doc.addImage(dataUrl, 'JPEG', 14, 10, imgWidth, imgHeight);
+                    currentY = 10 + imgHeight + 10;
+                    headerRendered = true;
                 } catch(e) {
-                    console.log("Canvas taint issue or rendering error: ", e);
+                    console.log("Canvas error: ", e);
                 }
             }
 
-            // 2. Company Details (Header - Top Left beside logo)
-            doc.setFont('helvetica', 'bold').setFontSize(14);
-            doc.text(CO.name, 42, 19);
+            if (!headerRendered) {
+                doc.setFont('helvetica', 'bold').setFontSize(15).text(CO.name, 105, 20, { align: 'center' });
+                doc.setFontSize(8).setFont('helvetica', 'normal');
+                if (CO.reg) doc.text('Reg No: ' + CO.reg, 105, 26, { align: 'center' });
+                const addrLines = doc.splitTextToSize(CO.address, 180);
+                doc.text(addrLines, 105, 30, { align: 'center' });
+                currentY = 30 + (addrLines.length * 4);
+                doc.text(`Tel: ${CO.tel} | Email: ${CO.email}`, 105, currentY + 2, { align: 'center' });
+                currentY += 15;
+            }
+
+            // 2. Document Title
+            doc.setFont('helvetica', 'bold').setFontSize(16);
+            doc.text('PURCHASE ORDER', 105, currentY, { align: 'center' });
             
-            doc.setFont('helvetica', 'normal').setFontSize(8);
-            let currentHeaderY = 24;
-            if (CO.reg) { doc.text('Co. Reg. No: ' + CO.reg, 42, currentHeaderY); currentHeaderY += 4; }
-            doc.text(CO.address, 42, currentHeaderY); currentHeaderY += 4;
-            doc.text(`Tel: ${CO.tel} | Email: ${CO.email}`, 42, currentHeaderY);
+            // Divider Line
+            doc.setDrawColor(45, 106, 39).setLineWidth(0.5);
+            doc.line(14, currentY + 4, 196, currentY + 4);
 
-            // 3. Document Title (Top Right)
-            doc.setFont('helvetica', 'bold').setFontSize(22);
-            doc.setTextColor(15, 23, 42);
-            doc.text('PURCHASE ORDER', 196, 24, { align: 'right' });
-            doc.setTextColor(0, 0, 0);
+            currentY += 12;
 
-            // Header Divider Line
-            doc.setDrawColor(200, 200, 200).setLineWidth(0.5);
-            doc.line(14, 44, 196, 44);
-
-            // 4. Supplier and PO Info Sections
-            doc.setFontSize(9).setFont('helvetica', 'bold');
-            doc.text('TO (SUPPLIER):', 14, 52);
-            doc.text('PO DETAILS:', 120, 52);
-
-            doc.setFontSize(9).setFont('helvetica', 'normal');
+            // 3. Supplier and PO Info (Left / Right Layout)
+            let leftY = currentY;
+            doc.setFontSize(10).setFont('helvetica', 'bold');
+            doc.text('TO (SUPPLIER):', 14, leftY);
+            leftY += 6;
             
-            // --- Left Side: Supplier details ---
-            let leftY = 57;
             doc.setFont('helvetica', 'bold');
             doc.text(supplier || '-', 14, leftY);
-            doc.setFont('helvetica', 'normal');
+            leftY += 5;
             
+            doc.setFont('helvetica', 'normal').setFontSize(9);
+            // STRICTLY PLACING ADDRESS AT THE TOP LEFT
             if (supplierAddress) {
-                leftY += 5;
                 const addrLines = doc.splitTextToSize(supplierAddress, 90);
                 doc.text(addrLines, 14, leftY);
                 leftY += (addrLines.length * 4.5);
-            } else {
-                leftY += 5;
             }
-            
             if (contact) { doc.text(`Attn: ${contact}`, 14, leftY); leftY += 5; }
             if (tel) { doc.text(`Tel/Email: ${tel}`, 14, leftY); leftY += 5; }
 
-            // --- Right Side: PO details ---
-            let rightY = 57;
-            doc.text(`PO Number:`, 120, rightY); 
+            let rightY = currentY;
+            doc.setFontSize(10).setFont('helvetica', 'bold');
+            doc.text('PO DETAILS:', 120, rightY);
+            rightY += 6;
+            
+            doc.setFontSize(9).setFont('helvetica', 'normal');
+            doc.text(`PO No:`, 120, rightY); 
             doc.setFont('helvetica', 'bold').text(poNo, 145, rightY); 
             doc.setFont('helvetica', 'normal');
             rightY += 6;
@@ -787,7 +796,7 @@
                 doc.text(projectRef, 145, rightY); 
             }
 
-            // 5. Render Table
+            // 4. Render Table
             const startY = Math.max(leftY, rightY) + 8;
             
             doc.autoTable({
@@ -797,12 +806,17 @@
                 theme: 'grid',
                 headStyles: { fillColor: [15, 23, 42], textColor: 255 },
                 styles: { fontSize: 8 },
-                columnStyles: { 0: { halign: 'center', cellWidth: 15 }, 2: { halign: 'center', cellWidth: 20 }, 3: { halign: 'right' }, 4: { halign: 'right' } }
+                columnStyles: { 
+                    0: { halign: 'center', cellWidth: 15 }, 
+                    2: { halign: 'center', cellWidth: 20 }, 
+                    3: { halign: 'right' }, 
+                    4: { halign: 'right' } 
+                }
             });
             
             const finalY = doc.lastAutoTable.finalY;
             
-            // 6. Totals & Footer Info
+            // 5. Totals & Footer Info
             doc.setFont('helvetica', 'bold').setFontSize(10);
             doc.text(`GRAND TOTAL: RM ${formatRM(total)}`, 196, finalY + 10, { align: 'right' });
             
@@ -810,8 +824,11 @@
             let noteY = finalY + 20;
             
             if (remarks) {
-                const remLines = doc.splitTextToSize(`Remarks: ${remarks}`, 120);
-                doc.text(remLines, 14, noteY);
+                doc.setFont('helvetica', 'bold');
+                doc.text('Remarks / T&C:', 14, noteY);
+                doc.setFont('helvetica', 'normal');
+                const remLines = doc.splitTextToSize(remarks, 180);
+                doc.text(remLines, 14, noteY + 5);
             }
             
             if (status === 'PREVIEW') {
@@ -855,7 +872,7 @@
                 formData.supplier_contact,
                 formData.supplier_tel,
                 formData.project_ref,
-                formData.delivery_address, // Used as supplier address
+                formData.delivery_address, 
                 formData.remarks,
                 formData.items,
                 formData.total,
