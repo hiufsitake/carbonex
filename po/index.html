@@ -6,7 +6,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0d1f0d">
+    <meta name="theme-color" content="#f8fafc">
     
     <title>CARBONEX | PO System</title>
     
@@ -14,7 +14,6 @@
     <link rel="icon" href="../logo.png" type="image/png">
     <link rel="manifest" href="manifest.json">
     
-    <!-- Dependencies (EmailJS removed) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -22,7 +21,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <!-- Initial Auth Guard -->
     <script>
         document.documentElement.style.display = 'none';
         
@@ -37,6 +35,7 @@
                     window.location.href = '../index.html';
                 } else {
                     document.documentElement.style.display = '';
+                    window.currentUserEmail = session.user.email;
                 }
             } catch (err) {
                 window.location.href = '../index.html';
@@ -51,76 +50,90 @@
         body { 
             font-family: 'Inter', sans-serif; 
             -webkit-tap-highlight-color: transparent; 
+            background-color: #f8fafc;
         }
         
         .input-box { 
-            border: 2px solid #f1f5f9; 
-            padding: 1rem; 
-            border-radius: 1.25rem; 
-            background: #f8fafc; 
+            background-color: #f1f5f9; 
+            color: #334155;
             font-weight: 700; 
+            padding: 0.875rem 1rem; 
+            border-radius: 1rem; 
             width: 100%; 
             outline: none; 
-            transition: all 0.2s; 
+            border: 2px solid transparent;
+            transition: all 0.2s ease; 
+            font-size: 0.875rem;
         }
         
         .input-box:focus { 
-            border-color: #2d6a27; 
-            background: white; 
+            border-color: #d1fae5; 
+            background-color: #ffffff; 
+        }
+
+        .input-box::placeholder {
+            color: #94a3b8;
+            font-weight: 700;
         }
         
         .tab-active { 
             background: #2d6a27; 
             color: white; 
-            box-shadow: 0 10px 15px -3px rgba(45,106,39,0.3); 
+            box-shadow: 0 4px 6px -1px rgba(45,106,39,0.2); 
         }
         
         .status-pending  { background: #fef3c7; color: #92400e; }
         .status-approved { background: #dcfce7; color: #166534; }
         .status-rejected { background: #fee2e2; color: #991b1b; }
         .status-draft    { background: #e0e7ff; color: #3730a3; }
+
+        /* Custom Scrollbar for items */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen pb-24 text-slate-900 font-medium">
+<body class="min-h-screen pb-24 text-slate-900">
 
-    <nav class="bg-[#0d1f0d] text-white p-5 sticky top-0 z-50 shadow-xl border-b-2 border-[#2d6a27]">
+    <nav class="bg-white p-5 sticky top-0 z-50 shadow-sm border-b border-slate-100">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <a href="../index.html" class="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-all">
+                <a href="../index.html" class="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-slate-700 transition-all">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 </a>
                 <div>
-                    <h1 class="font-black italic text-base uppercase tracking-tighter leading-none">
-                        CARBONEX <span class="text-[#4a9e3f] text-xs">PO System</span>
+                    <h1 class="font-black text-slate-800 text-sm uppercase tracking-tight leading-none">
+                        CARBONEX <span class="text-[#2d6a27]">PO</span>
                     </h1>
-                    <p class="text-[8px] text-slate-500 uppercase tracking-widest">Purchase Order Management</p>
+                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Purchasing</p>
                 </div>
             </div>
-            <div class="flex bg-slate-800 p-1 rounded-xl gap-1 overflow-x-auto">
-                <button onclick="switchTab('create')" id="nav-create" class="px-3 py-2 rounded-lg text-[9px] font-bold tab-active uppercase transition-all">Create</button>
-                <button onclick="switchTab('review')" id="nav-review" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all">Review</button>
-                <button onclick="switchTab('history')" id="nav-history" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all">Archive</button>
-                <button onclick="switchTab('admin')" id="nav-admin" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all">Admin</button>
+            <div class="flex bg-slate-50 p-1.5 rounded-2xl gap-1 overflow-x-auto border border-slate-100">
+                <button onclick="switchTab('create')" id="nav-create" class="px-4 py-2 rounded-xl text-[10px] font-bold tab-active uppercase transition-all tracking-widest">Create</button>
+                <button onclick="switchTab('review')" id="nav-review" class="px-4 py-2 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase transition-all tracking-widest">Review</button>
+                <button onclick="switchTab('history')" id="nav-history" class="px-4 py-2 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase transition-all tracking-widest">Archive</button>
+                <button onclick="switchTab('admin')" id="nav-admin" class="px-4 py-2 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase transition-all tracking-widest hidden">Admin</button>
             </div>
         </div>
     </nav>
 
-    <main class="max-w-4xl mx-auto p-4 mt-6">
+    <main class="max-w-4xl mx-auto p-4 mt-4 space-y-6">
         
-        <div id="auth-lock-screen" class="hidden p-10 text-center bg-white rounded-[2.5rem] border shadow-sm space-y-4">
-            <i data-lucide="shield-off" class="w-12 h-12 mx-auto text-red-400"></i>
-            <h3 class="font-black text-lg uppercase italic text-slate-800">Access Restricted</h3>
-            <p class="text-xs text-slate-500">This section requires administrator access.</p>
+        <div id="auth-lock-screen" class="hidden p-12 text-center bg-white rounded-[2rem] shadow-sm border border-slate-100 space-y-4">
+            <div class="bg-red-50 w-20 h-20 mx-auto rounded-full flex items-center justify-center">
+                <i data-lucide="shield-off" class="w-8 h-8 text-red-400"></i>
+            </div>
+            <h3 class="font-black text-lg uppercase text-slate-800 tracking-tight">Access Restricted</h3>
+            <p class="text-xs text-slate-400 font-bold">This section requires administrator clearance.</p>
         </div>
 
         <div id="tab-create">
             <form id="po-form" class="space-y-6">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-3">
-                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">PO Details</h2>
-                        <input type="text" id="po-number" class="input-box bg-slate-100 text-slate-500 font-black" readonly placeholder="Auto-generated">
-                        <input type="date" id="po-date" class="input-box" required>
-                        <select id="po-category" class="input-box text-[#2d6a27] font-bold">
+                
+                <section class="bg-white p-6 rounded-[2rem] shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] border border-slate-100/50">
+                    <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 mb-4">ISSUING CATEGORY</h2>
+                    <div class="relative">
+                        <select id="po-category" class="input-box text-[#2d6a27] font-black uppercase tracking-wide appearance-none cursor-pointer">
                             <option value="Materials">Materials &amp; Equipment</option>
                             <option value="Services">Professional Services</option>
                             <option value="Utilities">Utilities</option>
@@ -128,52 +141,70 @@
                             <option value="Carbon Credits">Carbon Credits</option>
                             <option value="Others">Others</option>
                         </select>
+                        <i data-lucide="chevron-down" class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-[#2d6a27] pointer-events-none"></i>
+                    </div>
+                </section>
+
+                <div class="grid md:grid-cols-2 gap-6">
+                    <section class="bg-white p-6 rounded-[2rem] shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] border border-slate-100/50 space-y-4">
+                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 mb-2">PO DETAILS</h2>
+                        <input type="text" id="po-number" class="input-box text-slate-500 bg-slate-50 cursor-not-allowed" readonly placeholder="PO Number">
+                        <input type="date" id="po-date" class="input-box" required>
+                        <input type="text" id="project-ref" placeholder="Project Number (Optional)" class="input-box focus:border-[#2d6a27]/30">
+                        <input type="text" id="req-name" class="input-box text-slate-500 bg-slate-50 cursor-not-allowed" readonly placeholder="Requestor Name">
+                        <input type="text" id="req-email" class="input-box text-slate-500 bg-slate-50 cursor-not-allowed" readonly placeholder="Requestor Email">
                     </section>
                     
-                    <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-3">
-                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">Supplier Info</h2>
-                        <input type="text" id="supplier-name" placeholder="Supplier / Vendor Name" class="input-box" required>
+                    <section class="bg-white p-6 rounded-[2rem] shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] border border-slate-100/50 flex flex-col space-y-4">
+                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 mb-2">SUPPLIER DETAILS</h2>
+                        <input type="text" id="supplier-name" placeholder="Supplier Name" class="input-box" required>
                         <input type="text" id="supplier-contact" placeholder="Contact Person" class="input-box">
                         <input type="text" id="supplier-tel" placeholder="Telephone / Email" class="input-box">
-                        <input type="text" id="project-ref" placeholder="Project / Reference No." class="input-box">
+                        <textarea id="delivery-address" placeholder="Supplier Address / Delivery details" class="input-box flex-1 min-h-[100px] resize-none"></textarea>
                     </section>
                 </div>
 
-                <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">Line Items</h2>
-                        <button type="button" onclick="addItemRow()" class="bg-[#f0f7ee] text-[#2d6a27] px-4 py-2 rounded-xl font-black text-[10px] uppercase flex items-center gap-1 shadow-sm hover:bg-[#2d6a27] hover:text-white transition-all">
-                            <i data-lucide="plus-circle" class="w-3 h-3"></i> Add Item
+                <section class="bg-white p-6 rounded-[2rem] shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] border border-slate-100/50">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400">ITEMIZED LIST</h2>
+                        <button type="button" onclick="addItemRow()" class="bg-[#ecfdf5] text-[#10b981] px-4 py-2 rounded-xl font-black text-[10px] uppercase tracking-widest flex items-center gap-1.5 hover:bg-[#d1fae5] transition-all">
+                            <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Item
                         </button>
                     </div>
-                    <div id="items-list" class="space-y-3"></div>
-                    <div class="flex justify-end pt-2 border-t border-slate-100">
-                        <div class="text-right space-y-1">
-                            <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest">TOTAL AMOUNT</p>
-                            <p id="total-display" class="text-2xl font-black text-[#0d1f0d]">RM 0.00</p>
+                    
+                    <div class="grid grid-cols-12 gap-2 px-4 mb-2 text-[9px] font-black uppercase tracking-widest text-slate-400">
+                        <div class="col-span-5">Description</div>
+                        <div class="col-span-2 text-center">Qty</div>
+                        <div class="col-span-2 text-right">Price</div>
+                        <div class="col-span-2 text-right">Total</div>
+                        <div class="col-span-1 text-center"></div>
+                    </div>
+
+                    <div id="items-list" class="space-y-2 mb-6"></div>
+                    
+                    <div class="flex justify-between items-end pt-4 border-t border-slate-100 mt-4">
+                        <textarea id="remarks" placeholder="Add remarks..." class="input-box w-1/2 h-[60px] resize-none bg-transparent border-slate-200" rows="1"></textarea>
+                        <div class="text-right">
+                            <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-1">TOTAL AMOUNT</p>
+                            <p id="total-display" class="text-3xl font-black text-[#0f172a] tracking-tight">RM 0.00</p>
                         </div>
                     </div>
                 </section>
 
-                <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-3">
-                    <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">Delivery &amp; Remarks</h2>
-                    <textarea id="delivery-address" placeholder="Delivery Address" class="input-box" rows="2"></textarea>
-                    <textarea id="remarks" placeholder="Special Instructions / Remarks" class="input-box" rows="2"></textarea>
-                </section>
-
-                <div class="flex gap-3">
-                    <button type="button" onclick="previewPDF()" class="w-1/3 bg-[#f0f7ee] text-[#2d6a27] border border-[#c6e0c0] font-black p-6 rounded-[2.5rem] shadow-sm uppercase tracking-widest text-[10px] italic flex flex-col md:flex-row items-center justify-center gap-2 hover:bg-[#2d6a27] hover:text-white transition-all">
-                        <i data-lucide="eye" class="w-5 h-5"></i> Preview
+                <div class="flex gap-4">
+                    <button type="button" onclick="previewPDF()" class="flex-1 bg-[#f0f9ff] text-[#0284c7] font-black p-5 rounded-[1.5rem] uppercase tracking-widest text-xs flex justify-center items-center gap-2 hover:bg-[#e0f2fe] transition-all">
+                        <i data-lucide="eye" class="w-4 h-4"></i> Preview
                     </button>
-                    <button type="submit" id="submit-btn" class="w-2/3 bg-[#0d1f0d] text-white font-black p-6 rounded-[2.5rem] shadow-xl uppercase tracking-widest text-xs italic flex flex-col md:flex-row items-center justify-center gap-3 hover:bg-[#2d6a27] transition-all">
-                        <i data-lucide="send" class="w-5 h-5"></i> <span id="submit-text">Submit PO</span>
+                    <button type="submit" id="submit-btn" class="flex-[2] bg-[#0f172a] text-white font-black p-5 rounded-[1.5rem] shadow-xl shadow-slate-200 uppercase tracking-widest text-xs flex justify-center items-center gap-2 hover:bg-[#1e293b] transition-all transform hover:-translate-y-0.5">
+                        <i data-lucide="send" class="w-4 h-4"></i> <span id="submit-text">Submit For Review</span>
                     </button>
                 </div>
 
-                <button type="button" onclick="saveDraft()" class="w-full bg-indigo-50 text-indigo-600 border border-indigo-100 font-black p-4 rounded-[2.5rem] shadow-sm uppercase tracking-widest text-[10px] italic flex items-center justify-center gap-2 hover:bg-indigo-100 transition-all">
-                    <i data-lucide="file-edit" class="w-4 h-4"></i> Save as Draft
+                <button type="button" onclick="saveDraft()" class="w-full bg-[#f8fafc] text-[#64748b] border-2 border-slate-100 font-black p-4 rounded-[1.5rem] uppercase tracking-widest text-[10px] flex justify-center items-center gap-2 hover:bg-slate-100 hover:text-slate-900 transition-all">
+                    <i data-lucide="save" class="w-3.5 h-3.5"></i> Save As Draft
                 </button>
-                <button type="button" onclick="cancelEdit()" id="cancel-edit-btn" class="hidden w-full border-2 border-slate-200 text-slate-400 font-black p-4 rounded-[2.5rem] uppercase tracking-widest text-[10px] italic">
+                
+                <button type="button" onclick="cancelEdit()" id="cancel-edit-btn" class="hidden w-full text-red-400 font-black p-4 uppercase tracking-widest text-[10px] hover:bg-red-50 rounded-[1.5rem] transition-all">
                     Cancel Editing
                 </button>
             </form>
@@ -184,23 +215,30 @@
         </div>
         
         <div id="tab-history" class="hidden space-y-4">
-            <input type="text" id="search-box" placeholder="Search PO No or Supplier..." oninput="renderHistory()" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-xs font-bold outline-none focus:border-[#2d6a27]">
+            <div class="relative">
+                <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input type="text" id="search-box" placeholder="Search PO Number or Supplier..." oninput="renderHistory()" class="input-box pl-10 bg-white border-slate-200 focus:border-[#2d6a27] shadow-sm">
+            </div>
             <div id="history-list" class="space-y-3"></div>
         </div>
         
         <div id="tab-admin" class="hidden">
-            <section class="bg-white p-8 rounded-[2.5rem] border shadow-sm space-y-6 text-center">
-                <i data-lucide="settings" class="w-12 h-12 mx-auto text-[#2d6a27]"></i>
-                <h2 class="font-black uppercase text-xs tracking-widest text-slate-500">Admin Tools</h2>
-                <button onclick="exportCSV()" class="w-full bg-[#0d1f0d] text-white p-5 rounded-3xl font-black uppercase text-xs tracking-widest shadow-lg flex items-center justify-center gap-3 hover:bg-[#2d6a27] transition-all">
-                    <i data-lucide="download" class="w-5 h-5"></i> Export All POs (CSV)
+            <section class="bg-white p-10 rounded-[2rem] shadow-sm border border-slate-100 text-center space-y-6">
+                <div class="bg-slate-50 w-20 h-20 mx-auto rounded-full flex items-center justify-center">
+                    <i data-lucide="database" class="w-8 h-8 text-[#2d6a27]"></i>
+                </div>
+                <div>
+                    <h2 class="font-black uppercase text-sm tracking-tight text-slate-800">System Administration</h2>
+                    <p class="text-xs text-slate-400 font-bold mt-1">Export database records and manage settings.</p>
+                </div>
+                <button onclick="exportCSV()" class="w-full max-w-sm mx-auto bg-[#0f172a] text-white p-5 rounded-[1.5rem] font-black uppercase text-xs tracking-widest flex items-center justify-center gap-2 hover:bg-[#1e293b] transition-all">
+                    <i data-lucide="download" class="w-4 h-4"></i> Export All POs (CSV)
                 </button>
             </section>
         </div>
 
-        <footer class="text-center py-6 mt-6">
-            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-300">CARBONEX VENTURES SDN. BHD. &nbsp;|&nbsp; 碳索未来</p>
-            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-200">&copy; 2026 ALL RIGHTS RESERVED.</p>
+        <footer class="text-center py-8">
+            <p class="text-[9px] font-black uppercase tracking-[0.5em] text-slate-400">© 2026 ALL RIGHTS RESERVED.</p>
         </footer>
     </main>
 
@@ -220,10 +258,10 @@
         
         const CO = {
             name: 'CARBONEX VENTURES SDN. BHD.',
-            reg:  'YOUR_REG_NUMBER',
+            reg:  '1556985-T', 
             email:'admin@carbonexventures.com',
-            address: 'YOUR_COMPANY_ADDRESS',
-            tel:  'YOUR_TELEPHONE'
+            address: 'Lot 123, Block 4, MCLD, Miri, Sarawak',
+            tel:  '+6012-3456789'
         };
 
         // ============================================================
@@ -258,10 +296,18 @@
             
             if (session && ADMIN_EMAILS.includes(session.user.email)) {
                 isAuthorized = true;
+                document.getElementById('nav-admin').classList.remove('hidden');
             }
             
             if (session?.user) {
                 currentApproverInitials = APPROVER_MAP[session.user.email] || session.user.email.split('@')[0].toUpperCase().substring(0, 3);
+                // Auto fill requestor details matching ITAKE layout requirements
+                if (session.user.email === 'hiu.fs.itake@gmail.com') {
+                    document.getElementById('req-name').value = 'Hiu Fu Shun';
+                } else {
+                    document.getElementById('req-name').value = session.user.email.split('@')[0];
+                }
+                document.getElementById('req-email').value = session.user.email;
             }
             
             addItemRow();
@@ -291,7 +337,7 @@
             
             document.querySelectorAll('nav button').forEach(btn => {
                 const isActive = btn.id === `nav-${tab}`;
-                btn.className = `px-3 py-2 rounded-lg text-[9px] font-bold uppercase transition-all ${isActive ? 'tab-active' : 'text-slate-400'}`;
+                btn.className = `px-4 py-2 rounded-xl text-[10px] font-bold uppercase transition-all tracking-widest ${isActive ? 'tab-active' : 'text-slate-400 hover:text-slate-600'}`;
             });
             
             lucide.createIcons();
@@ -313,7 +359,7 @@
                     .gte('created_at', `${year}-${month}-01`);
                 
                 const sequence = String((count || 0) + 1).padStart(2, '0');
-                document.getElementById('po-number').value = `CBX-PO-${dateString}-${sequence}`;
+                document.getElementById('po-number').value = `PO-${dateString}-${sequence}`;
                 document.getElementById('po-date').value = now.toISOString().split('T')[0];
             } catch (error) {
                 console.error("Failed to generate PO number", error);
@@ -324,17 +370,31 @@
             const container = document.getElementById('items-list');
             const div = document.createElement('div');
             
-            div.className = 'item-row grid grid-cols-12 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-100 items-center';
+            div.className = 'item-row grid grid-cols-12 gap-2 bg-[#f8fafc] p-2 rounded-2xl items-center border border-slate-100 hover:border-slate-200 transition-all';
+            
+            const lineTotal = (parseFloat(qty)||0) * (parseFloat(price)||0);
+            
             div.innerHTML = `
-                <input type="text" placeholder="Description" value="${desc}" class="col-span-6 bg-transparent font-bold text-[11px] outline-none" required>
-                <input type="number" placeholder="Qty" value="${qty}" min="0" class="col-span-2 bg-transparent font-bold text-[11px] outline-none text-center" oninput="updateTotal()" required>
-                <input type="number" step="0.01" placeholder="Unit Price" value="${price}" class="col-span-3 bg-transparent font-bold text-[11px] outline-none text-right" oninput="updateTotal()" required>
-                <button type="button" onclick="this.parentElement.remove(); updateTotal();" class="col-span-1 text-red-300 hover:text-red-600 flex justify-center">
+                <input type="text" placeholder="Description" value="${desc}" class="col-span-5 bg-transparent font-bold text-xs text-slate-700 outline-none px-2 py-1" required>
+                <input type="number" placeholder="Qty" value="${qty}" min="0" class="col-span-2 bg-transparent font-bold text-xs text-slate-700 outline-none text-center" oninput="updateRowTotal(this)" required>
+                <input type="number" step="0.01" placeholder="Price" value="${price}" class="col-span-2 bg-transparent font-bold text-xs text-slate-700 outline-none text-right" oninput="updateRowTotal(this)" required>
+                <div class="col-span-2 text-right font-black text-xs text-slate-400 row-total px-2">${lineTotal > 0 ? formatRM(lineTotal) : '-'}</div>
+                <button type="button" onclick="this.parentElement.remove(); updateTotal();" class="col-span-1 text-red-300 hover:text-red-500 flex justify-center p-1 rounded-lg hover:bg-red-50 transition-all">
                     <i data-lucide="trash-2" class="w-4 h-4"></i>
                 </button>
             `;
             container.appendChild(div);
             lucide.createIcons();
+            updateTotal();
+        }
+
+        function updateRowTotal(el) {
+            const row = el.closest('.item-row');
+            const inputs = row.querySelectorAll('input');
+            const qty = parseFloat(inputs[1].value) || 0;
+            const price = parseFloat(inputs[2].value) || 0;
+            const total = qty * price;
+            row.querySelector('.row-total').innerText = total > 0 ? formatRM(total) : '-';
             updateTotal();
         }
 
@@ -359,8 +419,10 @@
                 const qty = parseFloat(inputs[1].value) || 0;
                 const price = parseFloat(inputs[2].value) || 0;
                 
-                total += (qty * price);
-                items.push({ description: desc, qty: qty, unit_price: price, total: qty * price });
+                if (desc || qty > 0) {
+                    total += (qty * price);
+                    items.push({ description: desc, qty: qty, unit_price: price, total: qty * price });
+                }
             });
             
             return {
@@ -400,33 +462,43 @@
             const container = document.getElementById('review-list');
             
             if (pendingPOs.length === 0) {
-                container.innerHTML = '<div class="text-center p-10 text-slate-300 italic text-xs">Queue Clear &mdash; No Pending POs</div>';
+                container.innerHTML = `
+                    <div class="text-center py-20 px-6 bg-white rounded-[2rem] border border-slate-100 shadow-sm">
+                        <i data-lucide="check-circle-2" class="w-10 h-10 mx-auto text-[#2d6a27] mb-4 opacity-50"></i>
+                        <p class="text-xs font-black uppercase tracking-widest text-slate-400">All Caught Up</p>
+                        <p class="text-[10px] font-bold text-slate-300 mt-1">No purchase orders await your review.</p>
+                    </div>`;
+                lucide.createIcons();
                 return;
             }
 
             container.innerHTML = pendingPOs.map(po => `
-                <div class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-4">
+                <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 space-y-5">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-[9px] font-bold text-[#2d6a27] uppercase tracking-widest italic">${po.category || 'General'}</p>
-                            <h3 class="font-black text-lg text-slate-900 uppercase">${po.po_number}</h3>
-                            <p class="text-[10px] font-bold text-slate-500 uppercase">${po.supplier_name}</p>
-                            ${po.project_ref ? `<p class="text-[9px] font-bold text-slate-400">Ref: ${po.project_ref}</p>` : ''}
+                            <span class="inline-block px-2 py-1 bg-slate-50 rounded-lg text-[8px] font-black text-[#2d6a27] uppercase tracking-widest mb-2">${po.category || 'General'}</span>
+                            <h3 class="font-black text-lg text-slate-900 tracking-tight leading-none">${po.po_number}</h3>
+                            <p class="text-xs font-bold text-slate-500 mt-2">${po.supplier_name}</p>
+                            ${po.project_ref ? `<p class="text-[10px] font-bold text-slate-400 mt-0.5">Ref: ${po.project_ref}</p>` : ''}
                         </div>
                         <div class="text-right">
-                            <p class="text-[9px] font-bold text-slate-400 uppercase">Total</p>
-                            <p class="text-2xl font-black text-slate-900 leading-none">RM ${formatRM(po.total)}</p>
-                            <button onclick="generatePDF('${po.id}')" class="mt-2 bg-[#f0f7ee] text-[#2d6a27] px-3 py-1.5 rounded-full font-bold text-[9px] uppercase flex items-center gap-1 ml-auto hover:bg-[#2d6a27] hover:text-white transition-all">
-                                <i data-lucide="eye" class="w-3 h-3"></i> View PDF
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Value</p>
+                            <p class="text-xl font-black text-[#0f172a] leading-none">RM ${formatRM(po.total)}</p>
+                            <button onclick="generatePDF('${po.id}')" class="mt-3 bg-[#f8fafc] text-slate-600 px-3 py-1.5 rounded-xl font-black text-[9px] uppercase tracking-widest flex items-center gap-1.5 ml-auto hover:bg-slate-100 transition-all">
+                                <i data-lucide="file-text" class="w-3 h-3"></i> View PDF
                             </button>
                         </div>
                     </div>
-                    <div class="bg-slate-50 px-4 py-2 rounded-xl text-[10px] font-bold text-slate-500 text-center uppercase tracking-widest">
-                        Action as <span class="text-[#2d6a27]">${currentApproverInitials || '&mdash;'}</span>
+                    <div class="bg-slate-50 px-4 py-2 rounded-xl text-[9px] font-black text-slate-400 text-center uppercase tracking-widest border border-slate-100">
+                        Action Required by <span class="text-[#2d6a27]">${currentApproverInitials || '&mdash;'}</span>
                     </div>
                     <div class="flex gap-3">
-                        <button onclick="handleStatusChange('${po.id}','Approved')" class="flex-1 bg-[#2d6a27] text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-[#1a4a18] transition-all">Approve</button>
-                        <button onclick="handleStatusChange('${po.id}','Rejected')" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-600 transition-all">Reject</button>
+                        <button onclick="handleStatusChange('${po.id}','Approved')" class="flex-[2] bg-[#2d6a27] text-white py-4 rounded-[1rem] font-black text-xs uppercase tracking-widest hover:bg-[#1a4a18] transition-all flex justify-center items-center gap-2">
+                            <i data-lucide="check" class="w-4 h-4"></i> Approve
+                        </button>
+                        <button onclick="handleStatusChange('${po.id}','Rejected')" class="flex-1 bg-white text-red-500 border border-red-100 py-4 rounded-[1rem] font-black text-xs uppercase tracking-widest hover:bg-red-50 transition-all flex justify-center items-center gap-2">
+                            <i data-lucide="x" class="w-4 h-4"></i> Reject
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -445,26 +517,32 @@
             });
 
             if (filteredPOs.length === 0) {
-                container.innerHTML = '<div class="text-center p-10 text-slate-300 italic text-xs">No records found.</div>';
+                container.innerHTML = '<div class="text-center p-10 text-slate-300 font-bold text-xs">No records matched your search.</div>';
                 return;
             }
 
             container.innerHTML = filteredPOs.map(po => `
-                <div class="bg-white p-5 rounded-[2rem] border shadow-sm flex justify-between items-center gap-2">
+                <div class="bg-white p-5 rounded-[1.5rem] border border-slate-100 shadow-sm flex justify-between items-center gap-4 hover:border-slate-200 transition-all">
                     <div class="flex-1 min-w-0">
-                        <h3 class="font-black text-slate-800 text-sm tracking-tight">${po.po_number}</h3>
-                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter truncate">${po.supplier_name} &nbsp;|&nbsp; RM ${formatRM(po.total)}</p>
-                        <p class="text-[9px] font-bold text-slate-300">${po.date || ''}</p>
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-black text-slate-800 text-sm tracking-tight">${po.po_number}</h3>
+                            <span class="status-${po.status.toLowerCase()} px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest">${po.status}</span>
+                        </div>
+                        <p class="text-[10px] font-bold text-slate-500 truncate">${po.supplier_name}</p>
+                        <div class="flex items-center gap-2 mt-1">
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">${po.date || ''}</p>
+                            <span class="text-slate-300 text-[8px]">|</span>
+                            <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest">RM ${formatRM(po.total)}</p>
+                        </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                        <span class="status-${po.status.toLowerCase()} px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">${po.status}</span>
-                        <button onclick="generatePDF('${po.id}')" class="p-2.5 bg-[#f0f7ee] text-[#2d6a27] rounded-xl hover:bg-[#2d6a27] hover:text-white transition-all">
+                        <button onclick="generatePDF('${po.id}')" class="p-3 bg-slate-50 text-slate-500 rounded-xl hover:bg-[#2d6a27] hover:text-white transition-all">
                             <i data-lucide="printer" class="w-4 h-4"></i>
                         </button>
                         ${(po.status === 'Rejected' || po.status === 'Draft') ? 
-                            `<button onclick="loadForEdit('${po.id}')" class="p-2.5 bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
+                            `<button onclick="loadForEdit('${po.id}')" class="p-3 bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-100 transition-all"><i data-lucide="edit-3" class="w-4 h-4"></i></button>` : ''}
                         ${isAuthorized ? 
-                            `<button onclick="deletePO('${po.id}')" class="p-2.5 bg-red-50 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
+                            `<button onclick="deletePO('${po.id}')" class="p-3 bg-white border border-red-100 text-red-400 rounded-xl hover:bg-red-50 transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
                     </div>
                 </div>
             `).join('');
@@ -481,11 +559,14 @@
                               mkRow('Total', 'RM ' + formatRM(poData.total)) +
                               (poData.approved_by ? mkRow('Action By', poData.approved_by) : '');
 
-            const { data, error } = await supabaseClient.functions.invoke('send-po-email', {
-                body: { title, header_bg, html_body, remark_text }
-            });
-            
-            if (error) console.error('Failed to send email:', error);
+            try {
+                const { data, error } = await supabaseClient.functions.invoke('send-po-email', {
+                    body: { title, header_bg, html_body, remark_text }
+                });
+                if (error) console.error('Failed to send email:', error);
+            } catch(e) {
+                console.error("Edge function call failed: ", e);
+            }
         }
 
         // ============================================================
@@ -494,8 +575,18 @@
         document.getElementById('po-form').onsubmit = async function(e) {
             e.preventDefault();
             const payload = getFormData();
-            let res;
             
+            if (payload.items.length === 0) {
+                alert("Please add at least one line item.");
+                return;
+            }
+
+            const btn = document.getElementById('submit-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Processing...';
+            lucide.createIcons();
+
+            let res;
             if (editingId) {
                 res = await supabaseClient.from('po_logs').update(payload).eq('id', editingId);
             } else {
@@ -503,10 +594,9 @@
             }
             
             if (!res.error) {
-                // Trigger Resend Edge Function
                 await triggerResendEmail(
                     editingId ? 'PO Resubmitted' : 'New Purchase Order', 
-                    '#0d1f0d', 
+                    '#0f172a', 
                     payload, 
                     'Please review via CARBONEX Portal.'
                 );
@@ -517,6 +607,8 @@
                 if (isAuthorized) fetchRecords();
             } else {
                 alert('Error: ' + res.error.message);
+                btn.innerHTML = originalText;
+                lucide.createIcons();
             }
         };
 
@@ -531,20 +623,17 @@
             }
             
             if (!res.error) {
-                alert('Draft saved.');
+                alert('Draft saved successfully.');
                 cancelEdit();
             } else {
-                alert('Error: ' + res.error.message);
+                alert('Error saving draft: ' + res.error.message);
             }
         }
 
         async function deletePO(id) {
-            if (!isAuthorized) {
-                alert('Admin access required.');
-                return;
-            }
+            if (!isAuthorized) return;
             
-            if (confirm('Delete this PO record? This cannot be undone.')) {
+            if (confirm('Permanently delete this PO record? This action cannot be undone.')) {
                 await supabaseClient.from('po_logs').delete().eq('id', id);
                 fetchRecords();
             }
@@ -552,7 +641,7 @@
 
         async function handleStatusChange(id, newStatus) {
             if (!currentApproverInitials) {
-                alert('Your account is not mapped to an approver. Contact admin.');
+                alert('Account not mapped to approval matrix.');
                 return;
             }
             
@@ -568,18 +657,17 @@
                 .eq('id', id);
                 
             if (error) {
-                alert('Error: ' + error.message);
+                alert('Update Error: ' + error.message);
                 return;
             }
             
             if (po) {
                 const isApproved = newStatus === 'Approved';
-                // Trigger Resend Edge Function
                 await triggerResendEmail(
                     `PO ${newStatus}`, 
                     isApproved ? '#2d6a27' : '#ef4444', 
                     { ...po, approved_by: currentApproverInitials }, 
-                    isApproved ? 'Purchase Order approved. Please proceed.' : 'Purchase Order rejected. Please resubmit.'
+                    isApproved ? 'Purchase Order approved. Proceed with supplier.' : 'Purchase Order rejected. Please modify and resubmit.'
                 );
             }
             fetchRecords();
@@ -614,9 +702,19 @@
             editingId = null;
             document.getElementById('po-form').reset();
             document.getElementById('items-list').innerHTML = '';
-            document.getElementById('submit-text').innerText = 'Submit PO';
+            document.getElementById('submit-text').innerText = 'Submit For Review';
             document.getElementById('cancel-edit-btn').classList.add('hidden');
             
+            // Re-populate user specifics after form reset
+            if (window.currentUserEmail) {
+                 if (window.currentUserEmail === 'hiu.fs.itake@gmail.com') {
+                    document.getElementById('req-name').value = 'Hiu Fu Shun';
+                } else {
+                    document.getElementById('req-name').value = window.currentUserEmail.split('@')[0];
+                }
+                document.getElementById('req-email').value = window.currentUserEmail;
+            }
+
             addItemRow();
             setAutoPONumber();
             lucide.createIcons();
@@ -629,12 +727,10 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
-            doc.setFont('helvetica', 'bold').setFontSize(14).text(CO.name, 105, 20, { align: 'center' });
+            doc.setFont('helvetica', 'bold').setFontSize(15).text(CO.name, 105, 20, { align: 'center' });
             doc.setFontSize(8).setFont('helvetica', 'normal');
             
-            if (CO.reg && CO.reg !== 'YOUR_REG_NUMBER') {
-                doc.text('Reg: ' + CO.reg, 105, 26, { align: 'center' });
-            }
+            if (CO.reg) doc.text('Reg No: ' + CO.reg, 105, 26, { align: 'center' });
             
             const addrLines = doc.splitTextToSize(CO.address, 180);
             doc.text(addrLines, 105, 30, { align: 'center' });
@@ -643,45 +739,55 @@
             doc.text(`Tel: ${CO.tel} | Email: ${CO.email}`, 105, currentY + 2, { align: 'center' });
             
             doc.setDrawColor(45, 106, 39).setLineWidth(0.5).line(14, currentY + 6, 196, currentY + 6);
-            doc.setFontSize(13).setFont('helvetica', 'bold').text('PURCHASE ORDER', 105, currentY + 14, { align: 'center' });
+            doc.setFontSize(13).setFont('helvetica', 'bold').text('PURCHASE ORDER', 105, currentY + 15, { align: 'center' });
             
             doc.setFontSize(9).setFont('helvetica', 'normal');
-            doc.text(`PO No: ${poNo}`, 14, currentY + 22);
-            doc.text(`Date: ${date ? new Date(date).toLocaleDateString('en-GB') : '-'}`, 140, currentY + 22);
-            doc.text(`Supplier: ${supplier}`, 14, currentY + 28);
+            doc.text(`PO No: ${poNo}`, 14, currentY + 24);
+            doc.text(`Date: ${date ? new Date(date).toLocaleDateString('en-GB') : '-'}`, 140, currentY + 24);
+            doc.text(`Supplier: ${supplier}`, 14, currentY + 30);
             
-            if (contact) doc.text(`Contact: ${contact}`, 14, currentY + 33);
-            if (tel) doc.text(`Tel/Email: ${tel}`, 14, currentY + 38);
-            if (projectRef) doc.text(`Project Ref: ${projectRef}`, 140, currentY + 28);
+            if (contact) doc.text(`Contact: ${contact}`, 14, currentY + 35);
+            if (tel) doc.text(`Tel/Email: ${tel}`, 14, currentY + 40);
+            if (projectRef) doc.text(`Project Ref: ${projectRef}`, 140, currentY + 30);
             
             doc.autoTable({
-                startY: currentY + 44,
+                startY: currentY + 46,
                 head: [['No.', 'Description', 'Qty', 'Unit Price (RM)', 'Total (RM)']],
                 body: items.map((item, idx) => [idx + 1, item.description, item.qty, formatRM(item.unit_price), formatRM(item.total)]),
                 theme: 'grid',
-                headStyles: { fillColor: [13, 31, 13] },
+                headStyles: { fillColor: [15, 23, 42], textColor: 255 },
                 styles: { fontSize: 8 },
-                columnStyles: { 3: { halign: 'right' }, 4: { halign: 'right' } }
+                columnStyles: { 0: { halign: 'center', cellWidth: 15 }, 2: { halign: 'center', cellWidth: 20 }, 3: { halign: 'right' }, 4: { halign: 'right' } }
             });
             
             const finalY = doc.lastAutoTable.finalY;
-            doc.setFont('helvetica', 'bold').setFontSize(10).text(`TOTAL: RM ${formatRM(total)}`, 196, finalY + 10, { align: 'right' });
+            
+            doc.setFont('helvetica', 'bold').setFontSize(10);
+            doc.text(`GRAND TOTAL: RM ${formatRM(total)}`, 196, finalY + 10, { align: 'right' });
+            
+            doc.setFont('helvetica', 'normal').setFontSize(8);
+            let noteY = finalY + 20;
             
             if (deliveryAddr) {
-                doc.setFont('helvetica', 'normal').setFontSize(8);
-                doc.text(`Delivery: ${deliveryAddr}`, 14, finalY + 18);
+                const delLines = doc.splitTextToSize(`Delivery to: ${deliveryAddr}`, 120);
+                doc.text(delLines, 14, noteY);
+                noteY += (delLines.length * 4) + 2;
             }
             if (remarks) {
-                doc.text(`Remarks: ${remarks}`, 14, finalY + 24);
+                const remLines = doc.splitTextToSize(`Remarks: ${remarks}`, 120);
+                doc.text(remLines, 14, noteY);
             }
             
             if (status === 'PREVIEW') {
-                doc.setTextColor(45, 106, 39);
-                doc.setFontSize(11).text('PREVIEW — NOT SUBMITTED', 196, finalY + 32, { align: 'right' });
+                doc.setTextColor(200, 50, 50);
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12).text('DRAFT PREVIEW - UNAPPROVED', 196, finalY + 35, { align: 'right' });
                 doc.setTextColor(0, 0, 0);
             } else if (status === 'Approved' && approvedBy) {
                 const dt = approvedAt ? new Date(approvedAt).toLocaleString('en-GB') : '-';
-                doc.setFontSize(8).setFont('helvetica', 'italic').text(`Digitally approved by ${approvedBy} on ${dt}. No signature required.`, 14, finalY + 32);
+                doc.setFontSize(8).setFont('helvetica', 'italic');
+                doc.text(`Digitally approved by ${approvedBy} on ${dt}.`, 14, finalY + 40);
+                doc.text(`System generated document. No physical signature required.`, 14, finalY + 44);
             }
             
             if (isSaveAction) {
@@ -702,7 +808,7 @@
             const formData = getFormData();
             
             if (!formData.items.length) {
-                alert('Please add at least one item.');
+                alert('Cannot preview empty purchase order.');
                 return;
             }
             
@@ -725,10 +831,7 @@
         }
 
         async function exportCSV() {
-            if (!isAuthorized) {
-                alert('Admin access required.');
-                return;
-            }
+            if (!isAuthorized) return;
             
             const { data } = await supabaseClient
                 .from('po_logs')
@@ -742,7 +845,7 @@
                     po.po_number,
                     po.date,
                     po.category,
-                    `"${po.supplier_name}"`,
+                    `"${po.supplier_name || ''}"`,
                     `"${po.project_ref || ''}"`,
                     parseFloat(po.total || 0).toFixed(2),
                     po.status,
@@ -752,7 +855,7 @@
             
             const anchor = document.createElement('a');
             anchor.href = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
-            anchor.download = 'CARBONEX_PO.csv';
+            anchor.download = `CARBONEX_PO_${new Date().toISOString().split('T')[0]}.csv`;
             anchor.click();
         }
 
