@@ -94,7 +94,7 @@
 </head>
 <body class="min-h-screen pb-24 text-slate-900">
 
-    <img id="pdf-logo" src="../logo.jpg" style="display:none;" crossorigin="anonymous">
+    <img id="pdf-logo" src="../logo.jpg" style="display:none;">
 
     <nav class="bg-white p-5 sticky top-0 z-50 shadow-sm border-b border-slate-100">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
@@ -143,10 +143,10 @@
                     
                     <section class="bg-white p-6 rounded-[2rem] shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] border border-slate-100/50 flex flex-col space-y-4">
                         <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 mb-2">SUPPLIER DETAILS</h2>
-                        <input type="text" id="supplier-name" placeholder="Supplier Name" class="input-box" required>
-                        <input type="text" id="supplier-contact" placeholder="Contact Person" class="input-box">
+                        <input type="text" id="supplier-name" placeholder="Supplier / Contractor Name" class="input-box" required>
+                        <textarea id="delivery-address" placeholder="Full Supplier Address (e.g. NO. 62A, LORONG 1...)" class="input-box flex-1 min-h-[80px] resize-none"></textarea>
+                        <input type="text" id="supplier-contact" placeholder="Contact Person (Attn)" class="input-box">
                         <input type="text" id="supplier-tel" placeholder="Telephone / Email" class="input-box">
-                        <textarea id="delivery-address" placeholder="Supplier Address / Delivery details" class="input-box flex-1 min-h-[100px] resize-none"></textarea>
                     </section>
                 </div>
 
@@ -169,7 +169,7 @@
                     <div id="items-list" class="space-y-2 mb-6"></div>
                     
                     <div class="flex justify-between items-end pt-4 border-t border-slate-100 mt-4">
-                        <textarea id="remarks" placeholder="Add remarks..." class="input-box w-1/2 h-[60px] resize-none bg-transparent border-slate-200" rows="1"></textarea>
+                        <textarea id="remarks" placeholder="Add additional remarks / T&C..." class="input-box w-1/2 h-[60px] resize-none bg-transparent border-slate-200" rows="1"></textarea>
                         <div class="text-right">
                             <p class="text-[9px] font-black uppercase text-slate-400 tracking-widest mb-1">TOTAL AMOUNT</p>
                             <p id="total-display" class="text-3xl font-black text-[#0f172a] tracking-tight">RM 0.00</p>
@@ -179,7 +179,7 @@
 
                 <div class="flex gap-4">
                     <button type="button" onclick="previewPDF()" class="flex-1 bg-[#f0f9ff] text-[#0284c7] font-black p-5 rounded-[1.5rem] uppercase tracking-widest text-xs flex justify-center items-center gap-2 hover:bg-[#e0f2fe] transition-all">
-                        <i data-lucide="eye" class="w-4 h-4"></i> Preview
+                        <i data-lucide="eye" class="w-4 h-4"></i> Preview PDF
                     </button>
                     <button type="submit" id="submit-btn" class="flex-[2] bg-[#0f172a] text-white font-black p-5 rounded-[1.5rem] shadow-xl shadow-slate-200 uppercase tracking-widest text-xs flex justify-center items-center gap-2 hover:bg-[#1e293b] transition-all transform hover:-translate-y-0.5">
                         <i data-lucide="send" class="w-4 h-4"></i> <span id="submit-text">Submit For Review</span>
@@ -704,42 +704,94 @@
         }
 
         // ============================================================
-        // EXPORTS (PDF / CSV)
+        // EXPORTS (PDF / CSV) - WITH REDESIGNED HEADER & LAYOUT
         // ============================================================
-        function buildPDF(poNo, date, supplier, contact, tel, projectRef, deliveryAddr, remarks, items, total, status, approvedBy, approvedAt, isSaveAction = true) {
+        function buildPDF(poNo, date, supplier, contact, tel, projectRef, supplierAddress, remarks, items, total, status, approvedBy, approvedAt, isSaveAction = true) {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             
+            // 1. Render Logo (Bypasses tainted canvas limitations if loaded from same origin)
             const logoEl = document.getElementById('pdf-logo');
             if (logoEl && logoEl.complete && logoEl.naturalWidth !== 0) {
-                doc.addImage(logoEl, 'JPEG', 14, 12, 20, 20);
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = logoEl.naturalWidth;
+                    canvas.height = logoEl.naturalHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(logoEl, 0, 0);
+                    const dataUrl = canvas.toDataURL('image/jpeg');
+                    doc.addImage(dataUrl, 'JPEG', 14, 14, 24, 24);
+                } catch(e) {
+                    console.log("Canvas taint issue or rendering error: ", e);
+                }
             }
 
-            doc.setFont('helvetica', 'bold').setFontSize(15).text(CO.name, 105, 20, { align: 'center' });
-            doc.setFontSize(8).setFont('helvetica', 'normal');
+            // 2. Company Details (Header - Top Left beside logo)
+            doc.setFont('helvetica', 'bold').setFontSize(14);
+            doc.text(CO.name, 42, 19);
             
-            if (CO.reg) doc.text('Reg No: ' + CO.reg, 105, 26, { align: 'center' });
-            
-            const addrLines = doc.splitTextToSize(CO.address, 180);
-            doc.text(addrLines, 105, 30, { align: 'center' });
-            
-            let currentY = 30 + (addrLines.length * 4);
-            doc.text(`Tel: ${CO.tel} | Email: ${CO.email}`, 105, currentY + 2, { align: 'center' });
-            
-            doc.setDrawColor(45, 106, 39).setLineWidth(0.5).line(14, currentY + 6, 196, currentY + 6);
-            doc.setFontSize(13).setFont('helvetica', 'bold').text('PURCHASE ORDER', 105, currentY + 15, { align: 'center' });
-            
+            doc.setFont('helvetica', 'normal').setFontSize(8);
+            let currentHeaderY = 24;
+            if (CO.reg) { doc.text('Co. Reg. No: ' + CO.reg, 42, currentHeaderY); currentHeaderY += 4; }
+            doc.text(CO.address, 42, currentHeaderY); currentHeaderY += 4;
+            doc.text(`Tel: ${CO.tel} | Email: ${CO.email}`, 42, currentHeaderY);
+
+            // 3. Document Title (Top Right)
+            doc.setFont('helvetica', 'bold').setFontSize(22);
+            doc.setTextColor(15, 23, 42);
+            doc.text('PURCHASE ORDER', 196, 24, { align: 'right' });
+            doc.setTextColor(0, 0, 0);
+
+            // Header Divider Line
+            doc.setDrawColor(200, 200, 200).setLineWidth(0.5);
+            doc.line(14, 44, 196, 44);
+
+            // 4. Supplier and PO Info Sections
+            doc.setFontSize(9).setFont('helvetica', 'bold');
+            doc.text('TO (SUPPLIER):', 14, 52);
+            doc.text('PO DETAILS:', 120, 52);
+
             doc.setFontSize(9).setFont('helvetica', 'normal');
-            doc.text(`PO No: ${poNo}`, 14, currentY + 24);
-            doc.text(`Date: ${date ? new Date(date).toLocaleDateString('en-GB') : '-'}`, 140, currentY + 24);
-            doc.text(`Supplier: ${supplier}`, 14, currentY + 30);
             
-            if (contact) doc.text(`Contact: ${contact}`, 14, currentY + 35);
-            if (tel) doc.text(`Tel/Email: ${tel}`, 14, currentY + 40);
-            if (projectRef) doc.text(`Project Ref: ${projectRef}`, 140, currentY + 30);
+            // --- Left Side: Supplier details ---
+            let leftY = 57;
+            doc.setFont('helvetica', 'bold');
+            doc.text(supplier || '-', 14, leftY);
+            doc.setFont('helvetica', 'normal');
+            
+            if (supplierAddress) {
+                leftY += 5;
+                const addrLines = doc.splitTextToSize(supplierAddress, 90);
+                doc.text(addrLines, 14, leftY);
+                leftY += (addrLines.length * 4.5);
+            } else {
+                leftY += 5;
+            }
+            
+            if (contact) { doc.text(`Attn: ${contact}`, 14, leftY); leftY += 5; }
+            if (tel) { doc.text(`Tel/Email: ${tel}`, 14, leftY); leftY += 5; }
+
+            // --- Right Side: PO details ---
+            let rightY = 57;
+            doc.text(`PO Number:`, 120, rightY); 
+            doc.setFont('helvetica', 'bold').text(poNo, 145, rightY); 
+            doc.setFont('helvetica', 'normal');
+            rightY += 6;
+            
+            doc.text(`Date:`, 120, rightY); 
+            doc.text(date ? new Date(date).toLocaleDateString('en-GB') : '-', 145, rightY);
+            rightY += 6;
+            
+            if (projectRef) { 
+                doc.text(`Project Ref:`, 120, rightY); 
+                doc.text(projectRef, 145, rightY); 
+            }
+
+            // 5. Render Table
+            const startY = Math.max(leftY, rightY) + 8;
             
             doc.autoTable({
-                startY: currentY + 46,
+                startY: startY,
                 head: [['No.', 'Description', 'Qty', 'Unit Price (RM)', 'Total (RM)']],
                 body: items.map((item, idx) => [idx + 1, item.description, item.qty, formatRM(item.unit_price), formatRM(item.total)]),
                 theme: 'grid',
@@ -750,17 +802,13 @@
             
             const finalY = doc.lastAutoTable.finalY;
             
+            // 6. Totals & Footer Info
             doc.setFont('helvetica', 'bold').setFontSize(10);
             doc.text(`GRAND TOTAL: RM ${formatRM(total)}`, 196, finalY + 10, { align: 'right' });
             
             doc.setFont('helvetica', 'normal').setFontSize(8);
             let noteY = finalY + 20;
             
-            if (deliveryAddr) {
-                const delLines = doc.splitTextToSize(`${deliveryAddr}`, 120);
-                doc.text(delLines, 14, noteY);
-                noteY += (delLines.length * 4) + 2;
-            }
             if (remarks) {
                 const remLines = doc.splitTextToSize(`Remarks: ${remarks}`, 120);
                 doc.text(remLines, 14, noteY);
@@ -807,7 +855,7 @@
                 formData.supplier_contact,
                 formData.supplier_tel,
                 formData.project_ref,
-                formData.delivery_address,
+                formData.delivery_address, // Used as supplier address
                 formData.remarks,
                 formData.items,
                 formData.total,
