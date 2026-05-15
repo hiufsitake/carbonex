@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0d1f0d">
+    <link rel="apple-touch-icon" href="../logo.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../logo.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <title>CARBONEX | Accounting</title>
+    <script>
+        document.documentElement.style.display = 'none';
+        const _GU = 'https://bmsmgavlzboqnxxpekhl.supabase.co';
+        const _GK = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtc21nYXZsemJvcW54eHBla2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTE5NDgsImV4cCI6MjA5NDAyNzk0OH0.uCfN6_inw7WonvGT8Y2ahtTxbbqIcmrDGJas4bidEqM';
+        supabase.createClient(_GU,_GK).auth.getSession().then(({data:{session}})=>{
+            if(!session||!sessionStorage.getItem('cbx_tab_session'))window.location.href='../index.html';
+            else document.documentElement.style.display='';
+        }).catch(()=>window.location.href='../index.html');
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap');
+        *{box-sizing:border-box;}
+        body{font-family:'Inter',sans-serif;margin:0;padding:0;background:#f8fafc;-webkit-tap-highlight-color:transparent;}
+        #app{display:flex;height:100vh;overflow:hidden;}
+        #sidebar{width:220px;min-width:220px;background:#0d1f0d;display:flex;flex-direction:column;overflow-y:auto;transition:all 0.3s;}
+        .sb-brand{padding:18px 16px 14px;border-bottom:1px solid #1e3a1e;}
+        .sb-logo{height:28px;width:auto;object-fit:contain;}
+        .sb-title{font-size:13px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:0.05em;margin-top:6px;}
+        .sb-sub{font-size:8px;color:#4a7a4a;text-transform:uppercase;letter-spacing:0.3em;margin-top:2px;font-weight:700;}
+        .sb-section{padding:10px 8px 4px;}
+        .sb-label{font-size:8px;font-weight:700;color:#2d5a2d;text-transform:uppercase;letter-spacing:0.2em;padding:0 8px 5px;}
+        .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;color:#6b9b6b;transition:all 0.15s;margin-bottom:1px;}
+        .nav-item:hover{background:#1e3a1e;color:#a8d5a8;}
+        .nav-item.active{background:#2d6a27;color:#fff;}
+        .nav-item svg{width:14px;height:14px;flex-shrink:0;}
+        .sb-bottom{margin-top:auto;padding:10px;border-top:1px solid #1e3a1e;}
+        #main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+        #topbar{height:50px;background:#fff;border-bottom:2px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
+        #page-title{font-size:12px;font-weight:900;color:#0f172a;text-transform:uppercase;letter-spacing:0.08em;}
+        #content{flex:1;overflow-y:auto;padding:18px;}
+        .card{background:#fff;border:2px solid #f1f5f9;border-radius:1.25rem;box-shadow:0 1px 4px rgba(0,0,0,0.04);}
+        .stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px;}
+        .stat-card{background:#fff;border:2px solid #f1f5f9;border-radius:1rem;padding:14px 16px;}
+        .stat-label{font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:4px;}
+        .stat-value{font-size:18px;font-weight:900;color:#0f172a;line-height:1.2;}
+        .stat-sub{font-size:10px;color:#94a3b8;font-weight:600;margin-top:2px;}
+        .tbl-wrap{background:#fff;border:2px solid #f1f5f9;border-radius:1.25rem;overflow:hidden;margin-bottom:14px;}
+        .tbl-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:2px solid #f1f5f9;background:#f8fafc;}
+        .tbl-title{font-size:11px;font-weight:700;color:#0f172a;text-transform:uppercase;letter-spacing:0.08em;}
+        table{width:100%;border-collapse:collapse;}
+        th{text-align:left;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;padding:7px 14px;background:#f8fafc;border-bottom:2px solid #f1f5f9;}
+        td{padding:9px 14px;font-size:12px;color:#475569;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+        tr:last-child td{border-bottom:none;}
+        tbody tr:hover td{background:#f8fafc;cursor:pointer;}
+        .badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:9999px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;}
+        .b-paid,.b-delivered,.b-approved,.b-invoiced{background:#ecfdf5;color:#10b981;border:1px solid #6ee7b7;}
+        .b-pending{background:#fffbeb;color:#f59e0b;border:1px solid #fde68a;}
+        .b-overdue,.b-debit{background:#fef2f2;color:#ef4444;border:1px solid #fecaca;}
+        .b-draft,.b-credit{background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;}
+        .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:9999px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;transition:all 0.15s;white-space:nowrap;}
+        .btn:active{transform:scale(0.97);}
+        .btn-dark{background:#0d1f0d;color:#fff;}.btn-dark:hover{background:#1e3a1e;}
+        .btn-green{background:#2d6a27;color:#fff;}.btn-green:hover{background:#1a4a18;}
+        .btn-out{background:transparent;color:#475569;border:2px solid #e2e8f0;}.btn-out:hover{border-color:#2d6a27;color:#2d6a27;}
+        .btn-red{background:#ef4444;color:#fff;}.btn-red:hover{background:#dc2626;}
+        .btn-sm{padding:5px 11px;font-size:10px;}
+        .btn-xs{padding:3px 8px;font-size:9px;}
+        .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:500;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;backdrop-filter:blur(2px);}
+        .modal{background:#fff;border:2px solid #f1f5f9;border-radius:1.5rem;width:680px;max-width:100%;box-shadow:0 24px 64px rgba(0,0,0,0.14);}
+        .modal-hd{padding:18px 22px 12px;border-bottom:2px solid #f1f5f9;}
+        .modal-title{font-size:14px;font-weight:900;color:#0f172a;text-transform:uppercase;letter-spacing:0.05em;}
+        .modal-sub{font-size:11px;color:#94a3b8;margin-top:2px;font-weight:600;}
+        .modal-body{padding:18px 22px;max-height:72vh;overflow-y:auto;}
+        .modal-foot{padding:12px 22px;border-top:2px solid #f1f5f9;display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border-radius:0 0 1.5rem 1.5rem;}
+        .fg{margin-bottom:11px;}
+        .fl{font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:4px;}
+        .fi{width:100%;padding:9px 11px;background:#f8fafc;border:2px solid #f1f5f9;border-radius:0.75rem;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#0f172a;outline:none;transition:all 0.15s;}
+        .fi:focus{border-color:#2d6a27;background:#fff;}
+        .fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+        .fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+        @media(max-width:768px){#sidebar{width:0;min-width:0;overflow:hidden;position:fixed;height:100%;z-index:200;}#sidebar.open{width:220px;min-width:220px;}.stat-grid{grid-template-columns:1fr 1fr;}}
+    </style>
+</head>
+<body>
+<div id="app">
+    <aside id="sidebar">
+        <div class="sb-brand">
+            <img src="../logo.png" alt="CARBONEX" class="sb-logo" onerror="this.style.display='none'">
+            <div class="sb-title">Carbonex</div>
+            <div class="sb-sub">Accounting</div>
+        </div>
+        <div class="sb-section">
+            <div class="sb-label">Overview</div>
+            <div class="nav-item active" onclick="switchModule('dashboard')" id="nav-dashboard"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></div>
+        </div>
+        <div class="sb-section">
+            <div class="sb-label">Sales</div>
+            <div class="nav-item" onclick="switchModule('customers')" id="nav-customers"><i data-lucide="users"></i><span>Customers</span></div>
+            <div class="nav-item" onclick="switchModule('invoices')" id="nav-invoices"><i data-lucide="file-text"></i><span>Tax Invoices</span></div>
+            <div class="nav-item" onclick="switchModule('dos')" id="nav-dos"><i data-lucide="truck"></i><span>Delivery Orders</span></div>
+            <div class="nav-item" onclick="switchModule('creditnotes')" id="nav-creditnotes"><i data-lucide="receipt"></i><span>Credit / Debit Notes</span></div>
+        </div>
+        <div class="sb-section">
+            <div class="sb-label">Payments</div>
+            <div class="nav-item" onclick="switchModule('vouchers')" id="nav-vouchers"><i data-lucide="credit-card"></i><span>Payment Vouchers</span></div>
+        </div>
+        <div class="sb-section">
+            <div class="sb-label">Reports</div>
+            <div class="nav-item" onclick="switchModule('aging')" id="nav-aging"><i data-lucide="clock"></i><span>Aging Report</span></div>
+            <div class="nav-item" onclick="switchModule('sst')" id="nav-sst"><i data-lucide="percent"></i><span>SST Summary</span></div>
+        </div>
+        <div class="sb-bottom">
+            <a href="../index.html" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:#6b9b6b;font-size:11px;font-weight:700;text-decoration:none;text-transform:uppercase;letter-spacing:0.05em;transition:background 0.15s" onmouseover="this.style.background='#1e3a1e'" onmouseout="this.style.background='transparent'">
+                <i data-lucide="arrow-left" style="width:13px;height:13px"></i>Back to Portal
+            </a>
+        </div>
+    </aside>
+    <div id="main">
+        <div id="topbar">
+            <div style="display:flex;align-items:center;gap:10px">
+                <button onclick="document.getElementById('sidebar').classList.toggle('open')" id="menu-btn" style="display:none;background:none;border:none;cursor:pointer;color:#475569;padding:4px"><i data-lucide="menu" style="width:18px;height:18px"></i></button>
+                <span id="page-title">Dashboard</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+                <span id="user-email" style="font-size:10px;color:#94a3b8;font-weight:600"></span>
+                <button onclick="signOut()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;display:flex;align-items:center;gap:3px"><i data-lucide="log-out" style="width:11px;height:11px"></i>Sign Out</button>
+            </div>
+        </div>
+        <div id="content"><div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px">Loading...</div></div>
+    </div>
+</div>
+<div id="modal-container"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const SUPABASE_URL = 'https://bmsmgavlzboqnxxpekhl.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtc21nYXZsemJvcW54eHBla2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTE5NDgsImV4cCI6MjA5NDAyNzk0OH0.uCfN6_inw7WonvGT8Y2ahtTxbbqIcmrDGJas4bidEqM';
+const ADMIN_EMAILS = ['hiu.fs.itake@gmail.com'];
+const CO = { name:'CARBONEX VENTURES SDN. BHD.', reg:'', sst:'', tin:'', address:'', phone:'', email:'hiu.fs.itake@gmail.com', bank:'' };
+const SST_RATES = [
+    {code:'S6',label:'Service Tax 6%',rate:0.06},
+    {code:'ST10',label:'Sales Tax 10%',rate:0.10},
+    {code:'ST5',label:'Sales Tax 5%',rate:0.05},
+    {code:'EX',label:'SST Exempt (0%)',rate:0},
+    {code:'ZR',label:'Zero-rated Export',rate:0},
+];
+// ─────────────────────────────────────────────────────────────────────────────
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const fmtRM = n => 'RM ' + parseFloat(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmtDate = d => d ? new Date(d+'T00:00:00').toLocaleDateString('en-GB') : '—';
+const today = () => new Date().toISOString().split('T')[0];
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+let currentUser=null, isAdmin=false;
+let inactivityTimer;
+const resetIT = () => { clearTimeout(inactivityTimer); inactivityTimer=setTimeout(signOut,900000); };
+['mousemove','keydown','click','touchstart'].forEach(e=>document.addEventListener(e,resetIT));
+
+async function init() {
+    const {data:{session}} = await sb.auth.getSession();
+    if(!session||!sessionStorage.getItem('cbx_tab_session')){ window.location.href='../index.html'; return; }
+    currentUser = session.user;
+    isAdmin = ADMIN_EMAILS.includes(currentUser.email);
+    document.getElementById('user-email').textContent = currentUser.email;
+    if(window.innerWidth<=768) document.getElementById('menu-btn').style.display='block';
+    resetIT();
+    lucide.createIcons();
+    switchModule('dashboard');
+}
+
+async function signOut() {
+    sessionStorage.removeItem('cbx_tab_session');
+    await sb.auth.signOut();
+    window.location.href='../index.html';
+}
+
+const MODULE_TITLES = {dashboard:'Dashboard',customers:'Customers',invoices:'Tax Invoices',dos:'Delivery Orders',vouchers:'Payment Vouchers',creditnotes:'Credit / Debit Notes',aging:'Aging Report',sst:'SST Summary'};
+
+function switchModule(mod) {
+    document.querySelectorAll('.nav-item').forEach(el=>el.classList.remove('active'));
+    const nav=document.getElementById('nav-'+mod);
+    if(nav) nav.classList.add('active');
+    document.getElementById('page-title').textContent = MODULE_TITLES[mod]||mod;
+    document.getElementById('content').innerHTML = '<div style="text-align:center;padding:40px;color:#94a3b8;font-size:13px">Loading...</div>';
+    const fn = {dashboard:renderDashboard,customers:renderCustomers,invoices:renderInvoices,dos:renderDOs,vouchers:renderVouchers,creditnotes:renderCreditNotes,aging:renderAging,sst:renderSST};
+    if(fn[mod]) fn[mod]();
+}
+
+async function autoNumber(table, field, prefix) {
+    const now=new Date();
+    const ym=`${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}`;
+    const {data} = await sb.from(table).select(field).like(field,`${prefix}-${ym}%`).order('created_at',{ascending:false}).limit(1);
+    let next=1;
+    if(data?.length){ const p=data[0][field].split('-'); const n=parseInt(p[p.length-1],10); if(!isNaN(n)) next=n+1; }
+    return `${prefix}-${ym}-${String(next).padStart(3,'0')}`;
+}
+
+function calcItems(items) {
+    let sub=0,sst=0;
+    (items||[]).forEach(it=>{
+        const line=(parseFloat(it.qty)||0)*(parseFloat(it.unit_price)||0);
+        const rate=SST_RATES.find(r=>r.code===(it.sst_code||'EX'))?.rate||0;
+        sub+=line; sst+=line*rate;
+    });
+    return {subtotal:sub,sst,total:sub+sst};
+}
+
+function badge(s) {
+    const m={paid:'b-paid',pending:'b-pending',overdue:'b-overdue',draft:'b-draft',delivered:'b-delivered',approved:'b-approved',invoiced:'b-invoiced',credit:'b-credit',debit:'b-debit'};
+    return `<span class="badge ${m[s]||'b-pending'}">${s}</span>`;
+}
+
+function showToast(msg,type='success') {
+    let t=document.getElementById('_toast');
+    if(!t){t=document.createElement('div');t.id='_toast';document.body.appendChild(t);}
+    t.style.cssText=`position:fixed;bottom:24px;right:24px;z-index:9999;padding:11px 18px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:${type==='success'?'#2d6a27':'#ef4444'};box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:opacity 0.4s;opacity:1`;
+    t.textContent=msg;
+    clearTimeout(t._tid);
+    t._tid=setTimeout(()=>t.style.opacity='0',3000);
+}
+
+function showModal(html) {
+    document.getElementById('modal-container').innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()">${html}</div>`;
+    lucide.createIcons();
+}
+function closeModal(){ document.getElementById('modal-container').innerHTML=''; }
+
+// ── DASHBOARD ─────────────────────────────────────────────────────────────────
+async function renderDashboard() {
+    const [ir,dr,vr,cr] = await Promise.all([
+        sb.from('acc_invoices').select('status,total,inv_number,customer_id,created_at'),
+        sb.from('acc_delivery_orders').select('status'),
+        sb.from('acc_vouchers').select('status,amount,pv_number,payee,created_at'),
+        sb.from('acc_customers').select('id'),
+    ]);
+    const invs=ir.data||[], dos=dr.data||[], pvs=vr.data||[];
+    const totalInv=invs.reduce((s,i)=>s+(i.total||0),0);
+    const paidInv=invs.filter(i=>i.status==='paid').reduce((s,i)=>s+(i.total||0),0);
+    const outInv=invs.filter(i=>i.status==='pending'||i.status==='overdue').reduce((s,i)=>s+(i.total||0),0);
+    const ovdInv=invs.filter(i=>i.status==='overdue').reduce((s,i)=>s+(i.total||0),0);
+    document.getElementById('content').innerHTML=`
+    <div class="stat-grid">
+        <div class="stat-card"><div class="stat-label">Total Invoiced</div><div class="stat-value">${fmtRM(totalInv)}</div><div class="stat-sub">${invs.length} invoices</div></div>
+        <div class="stat-card" style="border-color:#6ee7b7"><div class="stat-label">Collected</div><div class="stat-value" style="color:#10b981">${fmtRM(paidInv)}</div><div class="stat-sub">${invs.filter(i=>i.status==='paid').length} paid</div></div>
+        <div class="stat-card" style="border-color:#fde68a"><div class="stat-label">Outstanding</div><div class="stat-value" style="color:#f59e0b">${fmtRM(outInv)}</div><div class="stat-sub">${invs.filter(i=>i.status==='pending'||i.status==='overdue').length} invoices</div></div>
+        <div class="stat-card" style="border-color:#fecaca"><div class="stat-label">Overdue</div><div class="stat-value" style="color:#ef4444">${fmtRM(ovdInv)}</div><div class="stat-sub">${invs.filter(i=>i.status==='overdue').length} invoices</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div class="tbl-wrap">
+            <div class="tbl-head"><span class="tbl-title">Recent Invoices</span><button class="btn btn-dark btn-sm" onclick="switchModule('invoices')">View All</button></div>
+            <table><thead><tr><th>Invoice No.</th><th>Total</th><th>Status</th></tr></thead><tbody>
+            ${invs.slice(0,6).map(i=>`<tr onclick="switchModule('invoices')"><td style="font-weight:700;color:#0d1f0d;font-size:11px">${esc(i.inv_number||'—')}</td><td style="font-size:11px;font-family:monospace">${fmtRM(i.total)}</td><td>${badge(i.status)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:18px;font-size:12px">No invoices yet</td></tr>'}
+            </tbody></table>
+        </div>
+        <div class="tbl-wrap">
+            <div class="tbl-head"><span class="tbl-title">Recent Vouchers</span><button class="btn btn-dark btn-sm" onclick="switchModule('vouchers')">View All</button></div>
+            <table><thead><tr><th>PV No.</th><th>Payee</th><th>Amount</th></tr></thead><tbody>
+            ${pvs.slice(0,6).map(v=>`<tr onclick="switchModule('vouchers')"><td style="font-weight:700;color:#0d1f0d;font-size:11px">${esc(v.pv_number||'—')}</td><td style="font-size:11px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.payee||'—')}</td><td style="font-size:11px;font-family:monospace">${fmtRM(v.amount)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:18px;font-size:12px">No vouchers yet</td></tr>'}
+            </tbody></table>
+        </div>
+    </div>`;
+    lucide.createIcons();
+}
+
+// ── CUSTOMERS ─────────────────────────────────────────────────────────────────
+async function renderCustomers() {
+    const {data} = await sb.from('acc_customers').select('*').order('created_at',{ascending:false});
+    const rows=data||[];
+    document.getElementById('content').innerHTML=`
+    <div class="tbl-wrap">
+        <div class="tbl-head"><span class="tbl-title">Customers (${rows.length})</span><button class="btn btn-dark btn-sm" onclick="openCustomerModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>Add</button></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>TIN</th><th>Credit Limit</th><th>Terms</th><th></th></tr></thead><tbody>
+        ${rows.map(c=>`<tr>
+            <td><div style="font-weight:700;color:#0f172a">${esc(c.name)}</div><div style="font-size:10px;color:#94a3b8">${esc(c.address||'')}</div></td>
+            <td>${esc(c.email||'—')}</td><td>${esc(c.phone||'—')}</td>
+            <td style="font-family:monospace;font-size:11px">${esc(c.tin||'—')}</td>
+            <td>${fmtRM(c.credit_limit||0)}</td><td>${c.payment_terms||30} days</td>
+            <td onclick="event.stopPropagation()"><div style="display:flex;gap:4px">
+                <button class="btn btn-out btn-xs" onclick="openCustomerModal('${c.id}')">Edit</button>
+                ${isAdmin?`<button class="btn btn-red btn-xs" onclick="deleteCustomer('${c.id}')">Del</button>`:''}
+            </div></td>
+        </tr>`).join('')||'<tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:28px;font-size:12px">No customers yet.</td></tr>'}
+        </tbody></table></div>
+    </div>`;
+    lucide.createIcons();
+}
+
+async function openCustomerModal(id) {
+    let c={name:'',email:'',phone:'',address:'',tin:'',reg:'',sst_no:'',credit_limit:0,payment_terms:30};
+    if(id){const {data}=await sb.from('acc_customers').select('*').eq('id',id).single();if(data)c=data;}
+    showModal(`<div class="modal">
+        <div class="modal-hd"><div class="modal-title">${id?'Edit':'New'} Customer</div></div>
+        <div class="modal-body">
+            <div class="fr2"><div class="fg"><label class="fl">Name *</label><input id="c_n" class="fi" value="${esc(c.name)}"></div><div class="fg"><label class="fl">Email</label><input id="c_e" class="fi" type="email" value="${esc(c.email||'')}"></div></div>
+            <div class="fr2"><div class="fg"><label class="fl">Phone</label><input id="c_p" class="fi" value="${esc(c.phone||'')}"></div><div class="fg"><label class="fl">TIN</label><input id="c_t" class="fi" value="${esc(c.tin||'')}"></div></div>
+            <div class="fr2"><div class="fg"><label class="fl">SSM Reg</label><input id="c_r" class="fi" value="${esc(c.reg||'')}"></div><div class="fg"><label class="fl">SST No.</label><input id="c_s" class="fi" value="${esc(c.sst_no||'')}"></div></div>
+            <div class="fg"><label class="fl">Address</label><textarea id="c_a" class="fi" rows="2" style="resize:vertical">${esc(c.address||'')}</textarea></div>
+            <div class="fr2"><div class="fg"><label class="fl">Credit Limit (RM)</label><input id="c_cl" class="fi" type="number" value="${c.credit_limit||0}"></div><div class="fg"><label class="fl">Payment Terms (days)</label><input id="c_pt" class="fi" type="number" value="${c.payment_terms||30}"></div></div>
+        </div>
+        <div class="modal-foot"><button class="btn btn-out" onclick="closeModal()">Cancel</button><button class="btn btn-dark" onclick="saveCustomer('${id||''}')">Save</button></div>
+    </div>`);
+}
+
+async function saveCustomer(id) {
+    const payload={name:document.getElementById('c_n').value,email:document.getElementById('c_e').value,phone:document.getElementById('c_p').value,address:document.getElementById('c_a').value,tin:document.getElementById('c_t').value,reg:document.getElementById('c_r').value,sst_no:document.getElementById('c_s').value,credit_limit:parseFloat(document.getElementById('c_cl').value)||0,payment_terms:parseInt(document.getElementById('c_pt').value)||30};
+    if(!payload.name){showToast('Name required','error');return;}
+    const {error}=id?await sb.from('acc_customers').update(payload).eq('id',id):await sb.from('acc_customers').insert(payload);
+    if(error){showToast('Error: '+error.message,'error');return;}
+    closeModal();showToast('Saved.');renderCustomers();
+}
+
+async function deleteCustomer(id) {
+    if(!isAdmin||!confirm('Delete customer?'))return;
+    await sb.from('acc_customers').delete().eq('id',id);
+    showToast('Deleted.');renderCustomers();
+}
+
+// ── INVOICES ──────────────────────────────────────────────────────────────────
+async function renderInvoices() {
+    const [ir,cr] = await Promise.all([
+        sb.from('acc_invoices').select('*').order('created_at',{ascending:false}),
+        sb.from('acc_customers').select('id,name')
+    ]);
+    const invs=ir.data||[], custs=cr.data||[];
+    const cmap=Object.fromEntries(custs.map(c=>[c.id,c.name]));
+    const tot=invs.reduce((s,i)=>s+(i.total||0),0);
+    document.getElementById('content').innerHTML=`
+    <div class="stat-grid">
+        ${[['Total Invoiced',fmtRM(tot),invs.length+' invoices',''],['Paid',fmtRM(invs.filter(i=>i.status==='paid').reduce((s,i)=>s+(i.total||0),0)),invs.filter(i=>i.status==='paid').length+' paid','#6ee7b7'],['Pending',fmtRM(invs.filter(i=>i.status==='pending').reduce((s,i)=>s+(i.total||0),0)),invs.filter(i=>i.status==='pending').length+' invoices','#fde68a'],['Overdue',fmtRM(invs.filter(i=>i.status==='overdue').reduce((s,i)=>s+(i.total||0),0)),invs.filter(i=>i.status==='overdue').length+' invoices','#fecaca']].map(([l,v,s,bc])=>`<div class="stat-card" style="border-color:${bc||'#f1f5f9'}"><div class="stat-label">${l}</div><div class="stat-value" style="font-size:15px">${v}</div><div class="stat-sub">${s}</div></div>`).join('')}
+    </div>
+    <div class="tbl-wrap">
+        <div class="tbl-head"><span class="tbl-title">Tax Invoices (${invs.length})</span><button class="btn btn-dark btn-sm" onclick="openInvoiceModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>New Invoice</button></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>Invoice No.</th><th>Customer</th><th>Date</th><th>Due</th><th>Subtotal</th><th>SST</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>
+        ${invs.map(inv=>`<tr onclick="viewInvoice('${inv.id}')">
+            <td style="font-weight:700;color:#0d1f0d">${esc(inv.inv_number)}</td>
+            <td style="font-size:12px">${esc(cmap[inv.customer_id]||'—')}</td>
+            <td style="color:#94a3b8;font-size:11px">${fmtDate(inv.date)}</td>
+            <td style="color:${inv.status==='overdue'?'#ef4444':'#94a3b8'};font-size:11px">${fmtDate(inv.due_date)}</td>
+            <td style="font-family:monospace;font-size:11px">${fmtRM(inv.subtotal)}</td>
+            <td style="font-family:monospace;font-size:11px;color:#f59e0b">${fmtRM(inv.sst_amount)}</td>
+            <td style="font-family:monospace;font-weight:700">${fmtRM(inv.total)}</td>
+            <td>${badge(inv.status)}</td>
+            <td onclick="event.stopPropagation()"><div style="display:flex;gap:3px">
+                <button class="btn btn-out btn-xs" onclick="printInvoicePDF('${inv.id}')">PDF</button>
+                ${(inv.status==='pending'||inv.status==='draft')?`<button class="btn btn-xs" style="background:#ecfdf5;color:#10b981;border:1px solid #6ee7b7" onclick="markInvPaid('${inv.id}')">Paid</button>`:''}
+                ${isAdmin?`<button class="btn btn-red btn-xs" onclick="deleteInvoice('${inv.id}')">Del</button>`:''}
+            </div></td>
+        </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:28px;font-size:12px">No invoices yet.</td></tr>'}
+        </tbody></table></div>
+    </div>`;
+    lucide.createIcons();
+}
+
+async function openInvoiceModal() {
+    const [cr,dr] = await Promise.all([
+        sb.from('acc_customers').select('id,name,payment_terms'),
+        sb.from('acc_delivery_orders').select('id,do_number,customer_id,items').eq('status','delivered')
+    ]);
+    const custs=cr.data||[], delivDOs=dr.data||[];
+    const nextNum=await autoNumber('acc_invoices','inv_number','CBX-INV');
+    const dueDefault=(()=>{const d=new Date();d.setDate(d.getDate()+30);return d.toISOString().split('T')[0];})();
+    showModal(`<div class="modal" style="width:760px">
+        <div class="modal-hd"><div class="modal-title">New Tax Invoice</div><div class="modal-sub">SST Act 2018 compliant</div></div>
+        <div class="modal-body">
+            ${delivDOs.length?`<div style="background:#ecfdf5;border:1px solid #6ee7b7;border-radius:0.75rem;padding:9px 12px;margin-bottom:10px;font-size:11px;color:#065f46;font-weight:600">📦 ${delivDOs.length} delivered DO(s) ready: ${delivDOs.map(d=>`<button class="btn btn-xs" style="background:#10b981;color:#fff;margin-left:5px" onclick="loadDO('${d.id}')">Load ${esc(d.do_number)}</button>`).join('')}</div>`:''}
+            <div class="fr3">
+                <div class="fg"><label class="fl">Invoice No.</label><input id="in_num" class="fi" value="${nextNum}" style="font-family:monospace"></div>
+                <div class="fg"><label class="fl">Invoice Date</label><input id="in_date" class="fi" type="date" value="${today()}"></div>
+                <div class="fg"><label class="fl">Due Date</label><input id="in_due" class="fi" type="date" value="${dueDefault}"></div>
+            </div>
+            <div class="fr2">
+                <div class="fg"><label class="fl">Customer *</label><select id="in_cust" class="fi" onchange="updDue(this)"><option value="">Select...</option>${custs.map(c=>`<option value="${c.id}" data-t="${c.payment_terms||30}">${esc(c.name)}</option>`).join('')}</select></div>
+                <div class="fg"><label class="fl">DO Reference</label><input id="in_doref" class="fi" placeholder="Optional" style="font-family:monospace"></div>
+            </div>
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;padding:7px 0 4px;border-top:2px solid #f1f5f9;margin-top:2px">Line Items</div>
+            <div style="display:grid;grid-template-columns:2.5fr 65px 65px 90px 65px 22px;gap:4px;padding:4px 5px;background:#f8fafc;border-radius:6px;margin-bottom:4px">${['Description','Qty','Unit','Price','SST',''].map(h=>`<span style="font-size:8px;font-weight:700;color:#94a3b8;text-transform:uppercase">${h}</span>`).join('')}</div>
+            <div id="in_items"></div>
+            <button class="btn btn-out btn-sm" style="margin:5px 0 10px" onclick="addInvItem()">+ Add Line</button>
+            <div id="in_totals" style="background:#f8fafc;border:1px solid #f1f5f9;border-radius:8px;padding:10px 12px;margin-bottom:10px"></div>
+            <div class="fg"><label class="fl">Notes / Payment Terms</label><textarea id="in_notes" class="fi" rows="2" style="resize:vertical" placeholder="Payment terms, bank info..."></textarea></div>
+        </div>
+        <div class="modal-foot"><button class="btn btn-out" onclick="closeModal()">Cancel</button><div style="display:flex;gap:7px"><button class="btn btn-out" onclick="saveInvoice('draft')">Draft</button><button class="btn btn-dark" onclick="saveInvoice('pending')">Submit Invoice</button></div></div>
+    </div>`);
+    window._ii=[{desc:'',qty:1,unit:'service',unit_price:'',sst_code:'S6'}];
+    window._idDOs=delivDOs;
+    renderInvItems();
+    lucide.createIcons();
+}
+
+function updDue(sel){const t=parseInt(sel.selectedOptions[0]?.dataset.t||30);const d=new Date();d.setDate(d.getDate()+t);document.getElementById('in_due').value=d.toISOString().split('T')[0];}
+
+function loadDO(id){
+    const d=window._idDOs?.find(x=>x.id===id);if(!d)return;
+    document.getElementById('in_doref').value=d.do_number;
+    const cs=document.getElementById('in_cust');if(cs)cs.value=d.customer_id;
+    window._ii=(d.items||[]).map(it=>({desc:it.desc||'',qty:it.qty||1,unit:it.unit||'unit',unit_price:String(it.unit_price||''),sst_code:it.sst_code||'S6'}));
+    renderInvItems();
+}
+
+function renderInvItems(){
+    document.getElementById('in_items').innerHTML=(window._ii||[]).map((it,i)=>`
+    <div style="display:grid;grid-template-columns:2.5fr 65px 65px 90px 65px 22px;gap:4px;align-items:center;margin-bottom:4px">
+        <input class="fi" style="padding:6px 8px;font-size:12px" value="${esc(it.desc)}" oninput="_ii[${i}].desc=this.value" placeholder="Description">
+        <input class="fi" style="padding:6px 7px;font-size:12px;text-align:center" type="number" value="${it.qty}" oninput="_ii[${i}].qty=this.value">
+        <input class="fi" style="padding:6px 7px;font-size:12px" value="${esc(it.unit)}" oninput="_ii[${i}].unit=this.value">
+        <input class="fi" style="padding:6px 7px;font-size:12px;text-align:right;font-family:monospace" type="number" step="0.01" value="${it.unit_price}" oninput="_ii[${i}].unit_price=this.value;updInvTotals()" placeholder="0.00">
+        <select class="fi" style="padding:6px 4px;font-size:11px" onchange="_ii[${i}].sst_code=this.value;updInvTotals()">${SST_RATES.map(r=>`<option value="${r.code}" ${it.sst_code===r.code?'selected':''}>${r.code}</option>`).join('')}</select>
+        <button onclick="_ii.splice(${i},1);renderInvItems()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px">×</button>
+    </div>`).join('');
+    updInvTotals();
+}
+function addInvItem(){window._ii=[...(window._ii||[]),{desc:'',qty:1,unit:'service',unit_price:'',sst_code:'S6'}];renderInvItems();}
+function updInvTotals(){
+    const {subtotal,sst,total}=calcItems(window._ii||[]);
+    const el=document.getElementById('in_totals');if(!el)return;
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span>Subtotal (excl. SST)</span><span style="font-family:monospace">${fmtRM(subtotal)}</span></div><div style="display:flex;justify-content:space-between;font-size:12px;color:#f59e0b;margin-bottom:2px"><span>SST</span><span style="font-family:monospace">${fmtRM(sst)}</span></div><div style="display:flex;justify-content:space-between;font-size:15px;font-weight:900;padding-top:6px;border-top:2px solid #f1f5f9"><span>TOTAL</span><span style="font-family:monospace">${fmtRM(total)}</span></div>`;
+}
+
+async function saveInvoice(status){
+    const items=window._ii||[];
+    const custId=document.getElementById('in_cust').value;
+    if(!custId){showToast('Select a customer','error');return;}
+    const {subtotal,sst,total}=calcItems(items);
+    const {error}=await sb.from('acc_invoices').insert({inv_number:document.getElementById('in_num').value,customer_id:custId,date:document.getElementById('in_date').value,due_date:document.getElementById('in_due').value,items:items.map(it=>({...it,qty:parseFloat(it.qty)||0,unit_price:parseFloat(it.unit_price)||0})),subtotal,sst_amount:sst,total,status,do_ref:document.getElementById('in_doref').value,notes:document.getElementById('in_notes').value,created_by:currentUser?.email});
+    if(error){showToast('Error: '+error.message,'error');return;}
+    closeModal();showToast('Invoice saved.');renderInvoices();
+}
+
+async function markInvPaid(id){await sb.from('acc_invoices').update({status:'paid'}).eq('id',id);showToast('Marked paid.');renderInvoices();}
+async function deleteInvoice(id){if(!isAdmin||!confirm('Delete?'))return;await sb.from('acc_invoices').delete().eq('id',id);showToast('Deleted.');renderInvoices();}
+
+async function viewInvoice(id){
+    const {data:inv}=await sb.from('acc_invoices').select('*').eq('id',id).single();if(!inv)return;
+    let cn='—',ca='';
+    if(inv.customer_id){const {data:c}=await sb.from('acc_customers').select('name,address,tin').eq('id',inv.customer_id).single();if(c){cn=c.name;ca=c.address||'';}}
+    const {subtotal,sst,total}=calcItems(inv.items||[]);
+    showModal(`<div class="modal" style="width:700px">
+        <div class="modal-hd"><div class="modal-title">${esc(inv.inv_number)}</div><div class="modal-sub">${badge(inv.status)}</div></div>
+        <div class="modal-body">
+            <div class="fr2" style="margin-bottom:14px">
+                <div><div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px">Bill To</div><div style="font-weight:700;color:#0f172a">${esc(cn)}</div><div style="font-size:11px;color:#94a3b8;white-space:pre-line">${esc(ca)}</div></div>
+                <div style="font-size:12px;color:#475569;line-height:2"><div>Date: <strong>${fmtDate(inv.date)}</strong></div><div>Due: <strong style="color:${inv.status==='overdue'?'#ef4444':'inherit'}">${fmtDate(inv.due_date)}</strong></div>${inv.do_ref?`<div>DO Ref: <strong>${esc(inv.do_ref)}</strong></div>`:''}</div>
+            </div>
+            <table style="font-size:12px;margin-bottom:12px"><thead><tr><th>#</th><th>Description</th><th>Qty</th><th>Price</th><th>SST</th><th>Amount</th></tr></thead><tbody>
+            ${(inv.items||[]).map((it,i)=>{const line=(it.qty||0)*(it.unit_price||0);const rate=SST_RATES.find(r=>r.code===(it.sst_code||'EX'))?.rate||0;return`<tr><td style="color:#94a3b8">${i+1}</td><td style="font-weight:600;color:#0f172a">${esc(it.desc)}<br><span style="font-size:9px;color:#94a3b8">${it.sst_code}</span></td><td>${it.qty} ${esc(it.unit||'')}</td><td style="font-family:monospace">${fmtRM(it.unit_price)}</td><td style="font-family:monospace;color:#f59e0b">${rate>0?fmtRM(line*rate):'—'}</td><td style="font-family:monospace;font-weight:700">${fmtRM(line+line*rate)}</td></tr>`;}).join('')}
+            </tbody></table>
+            <div style="display:flex;justify-content:flex-end"><div style="width:240px;background:#f8fafc;border:1px solid #f1f5f9;border-radius:8px;padding:10px 12px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:2px"><span>Subtotal</span><span style="font-family:monospace">${fmtRM(subtotal)}</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:#f59e0b;margin-bottom:2px"><span>SST</span><span style="font-family:monospace">${fmtRM(sst)}</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:900;padding-top:6px;border-top:2px solid #e5e7eb"><span>TOTAL</span><span style="font-family:monospace">${fmtRM(total)}</span></div>
+            </div></div>
+            ${inv.notes?`<div style="margin-top:10px;padding:9px 11px;background:#f8fafc;border-radius:8px;font-size:11px;color:#475569">${esc(inv.notes)}</div>`:''}
+        </div>
+        <div class="modal-foot"><button class="btn btn-out" onclick="closeModal()">Close</button><div style="display:flex;gap:7px">
+            ${(inv.status==='pending'||inv.status==='draft')?`<button class="btn btn-xs" style="background:#ecfdf5;color:#10b981;border:1px solid #6ee7b7" onclick="markInvPaid('${inv.id}');closeModal()">Mark Paid</button>`:''}
+            <button class="btn btn-dark btn-sm" onclick="printInvoicePDF('${inv.id}')">Download PDF</button>
+        </div></div>
+    </div>`);
+}
+
+async function printInvoicePDF(id){
+    const {data:inv}=await sb.from('acc_invoices').select('*').eq('id',id).single();if(!inv)return;
+    let cust=null;
+    if(inv.customer_id){const {data}=await sb.from('acc_customers').select('*').eq('id',inv.customer_id).single();cust=data;}
+    const {jsPDF}=window.jspdf;const doc=new jsPDF();
+    doc.setFont('helvetica','bold').setFontSize(15).text(CO.name,14,22);
+    doc.setFont('helvetica','normal').setFontSize(8).setTextColor(100,100,100);
+    if(CO.reg)doc.text('SSM: '+CO.reg,14,28);
+    if(CO.address)doc.text(doc.splitTextToSize(CO.address,90),14,32);
+    doc.setFont('helvetica','bold').setFontSize(18).setTextColor(150,20,10).text('TAX INVOICE',196,22,{align:'right'});
+    doc.setFontSize(11).setTextColor(0,0,0).text(inv.inv_number,196,30,{align:'right'});
+    doc.setDrawColor(200,200,200).line(14,48,196,48);
+    doc.setFont('helvetica','bold').setFontSize(8).setTextColor(100,100,100).text('BILL TO',14,56);
+    doc.setFont('helvetica','normal').setFontSize(11).setTextColor(0,0,0).text(cust?.name||'—',14,62);
+    if(cust?.address)doc.setFontSize(8).setTextColor(100,100,100).text(doc.splitTextToSize(cust.address,90),14,68);
+    if(cust?.tin)doc.text('TIN: '+cust.tin,14,82);
+    doc.setFontSize(8).setTextColor(100,100,100);
+    doc.text('Invoice Date: '+fmtDate(inv.date),130,56);
+    doc.text('Due Date: '+fmtDate(inv.due_date),130,62);
+    if(inv.do_ref)doc.text('DO Ref: '+inv.do_ref,130,68);
+    const {subtotal,sst,total}=calcItems(inv.items||[]);
+    doc.autoTable({startY:92,head:[['#','Description','Qty','Unit','Unit Price','SST','Amount']],body:(inv.items||[]).map((it,i)=>{const line=(it.qty||0)*(it.unit_price||0);const rate=SST_RATES.find(r=>r.code===(it.sst_code||'EX'))?.rate||0;return[i+1,it.desc,it.qty,it.unit||'',parseFloat(it.unit_price||0).toFixed(2),rate>0?(line*rate).toFixed(2):'—',(line+line*rate).toFixed(2)];}),theme:'grid',headStyles:{fillColor:[13,31,13],fontSize:8},bodyStyles:{fontSize:9},columnStyles:{4:{halign:'right'},5:{halign:'right'},6:{halign:'right'}}});
+    const fy=doc.lastAutoTable.finalY+8;
+    doc.setFont('helvetica','normal').setFontSize(10);
+    doc.text('Subtotal (excl. SST):',130,fy);doc.text(fmtRM(subtotal),196,fy,{align:'right'});
+    doc.text('SST Amount:',130,fy+7);doc.text(fmtRM(sst),196,fy+7,{align:'right'});
+    doc.setFont('helvetica','bold').setFontSize(12);
+    doc.text('TOTAL DUE (MYR):',130,fy+16);doc.text(fmtRM(total),196,fy+16,{align:'right'});
+    if(inv.notes)doc.setFont('helvetica','normal').setFontSize(8).setTextColor(100,100,100).text(doc.splitTextToSize('Notes: '+inv.notes,100),14,fy+6);
+    doc.setFontSize(7).setTextColor(150,150,150).text('Computer-generated Tax Invoice — CARBONEX VENTURES SDN. BHD.',14,285);
+    doc.save(inv.inv_number+'.pdf');
+}
+
+// ── DELIVERY ORDERS ───────────────────────────────────────────────────────────
+async function renderDOs(){
+    const [dr,cr]=await Promise.all([sb.from('acc_delivery_orders').select('*').order('created_at',{ascending:false}),sb.from('acc_customers').select('id,name')]);
+    const dos=dr.data||[],cmap=Object.fromEntries((cr.data||[]).map(c=>[c.id,c.name]));
+    document.getElementById('content').innerHTML=`
+    <div class="tbl-wrap">
+        <div class="tbl-head"><span class="tbl-title">Delivery Orders (${dos.length})</span><button class="btn btn-dark btn-sm" onclick="openDOModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>New DO</button></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>DO No.</th><th>Customer</th><th>Date</th><th>Deliver To</th><th>Items</th><th>Status</th><th>Invoice Ref</th><th></th></tr></thead><tbody>
+        ${dos.map(d=>`<tr>
+            <td style="font-weight:700;color:#0d1f0d">${esc(d.do_number)}</td>
+            <td>${esc(cmap[d.customer_id]||'—')}</td>
+            <td style="color:#94a3b8;font-size:11px">${fmtDate(d.date)}</td>
+            <td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.deliver_to||'—')}</td>
+            <td style="font-size:11px;color:#94a3b8">${(d.items||[]).length} item(s)</td>
+            <td>${badge(d.status)}</td>
+            <td style="font-size:11px;font-family:monospace">${esc(d.invoice_ref||'—')}</td>
+            <td onclick="event.stopPropagation()"><div style="display:flex;gap:3px">
+                ${d.status==='pending'?`<button class="btn btn-green btn-xs" onclick="markDODelivered('${d.id}')">Delivered</button>`:''}
+                ${isAdmin?`<button class="btn btn-red btn-xs" onclick="deleteDO('${d.id}')">Del</button>`:''}
+            </div></td>
+        </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:28px;font-size:12px">No delivery orders yet.</td></tr>'}
+        </tbody></table></div>
+    </div>`;
+    lucide.createIcons();
+}
+
+async function openDOModal(){
+    const {data:custs}=await sb.from('acc_customers').select('id,name');
+    const nextNum=await autoNumber('acc_delivery_orders','do_number','CBX-DO');
+    showModal(`<div class="modal" style="width:740px">
+        <div class="modal-hd"><div class="modal-title">New Delivery Order</div></div>
+        <div class="modal-body">
+            <div class="fr3">
+                <div class="fg"><label class="fl">DO No.</label><input id="do_n" class="fi" value="${nextNum}" style="font-family:monospace"></div>
+                <div class="fg"><label class="fl">Date</label><input id="do_d" class="fi" type="date" value="${today()}"></div>
+                <div class="fg"><label class="fl">Customer *</label><select id="do_c" class="fi"><option value="">Select...</option>${(custs||[]).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div>
+            </div>
+            <div class="fg"><label class="fl">Deliver To</label><textarea id="do_a" class="fi" rows="2" style="resize:vertical" placeholder="Delivery address / location"></textarea></div>
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;padding:7px 0 4px;border-top:2px solid #f1f5f9;margin-top:2px">Items</div>
+            <div id="do_items"></div>
+            <button class="btn btn-out btn-sm" style="margin:5px 0 10px" onclick="addDOItem()">+ Add Item</button>
+            <div class="fg"><label class="fl">Received By</label><input id="do_r" class="fi" placeholder="Recipient name (if known)"></div>
+        </div>
+        <div class="modal-foot"><button class="btn btn-out" onclick="closeModal()">Cancel</button><button class="btn btn-dark" onclick="saveDO()">Create DO</button></div>
+    </div>`);
+    window._di=[{desc:'',qty:1,unit:'unit',unit_price:'',sst_code:'ST10'}];
+    renderDOItems();lucide.createIcons();
+}
+function renderDOItems(){
+    document.getElementById('do_items').innerHTML=(window._di||[]).map((it,i)=>`
+    <div style="display:grid;grid-template-columns:2.5fr 60px 60px 90px 65px 22px;gap:4px;align-items:center;margin-bottom:4px">
+        <input class="fi" style="padding:6px 8px;font-size:12px" value="${esc(it.desc)}" oninput="_di[${i}].desc=this.value" placeholder="Item description">
+        <input class="fi" style="padding:6px 7px;font-size:12px;text-align:center" type="number" value="${it.qty}" oninput="_di[${i}].qty=this.value">
+        <input class="fi" style="padding:6px 7px;font-size:12px" value="${esc(it.unit)}" oninput="_di[${i}].unit=this.value">
+        <input class="fi" style="padding:6px 7px;font-size:12px;text-align:right;font-family:monospace" type="number" step="0.01" value="${it.unit_price}" oninput="_di[${i}].unit_price=this.value" placeholder="Unit price">
+        <select class="fi" style="padding:6px 4px;font-size:11px" onchange="_di[${i}].sst_code=this.value">${SST_RATES.map(r=>`<option value="${r.code}" ${it.sst_code===r.code?'selected':''}>${r.code}</option>`).join('')}</select>
+        <button onclick="_di.splice(${i},1);renderDOItems()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px">×</button>
+    </div>`).join('');
+}
+function addDOItem(){window._di=[...(window._di||[]),{desc:'',qty:1,unit:'unit',unit_price:'',sst_code:'ST10'}];renderDOItems();}
+async function saveDO(){
+    const custId=document.getElementById('do_c').value;if(!custId){showToast('Select a customer','error');return;}
+    const {error}=await sb.from('acc_delivery_orders').insert({do_number:document.getElementById('do_n').value,customer_id:custId,date:document.getElementById('do_d').value,deliver_to:document.getElementById('do_a').value,items:(window._di||[]).map(it=>({...it,qty:parseFloat(it.qty)||0,unit_price:parseFloat(it.unit_price)||0})),received_by:document.getElementById('do_r').value,status:'pending'});
+    if(error){showToast('Error: '+error.message,'error');return;}
+    closeModal();showToast('Delivery Order created.');renderDOs();
+}
+async function markDODelivered(id){await sb.from('acc_delivery_orders').update({status:'delivered'}).eq('id',id);showToast('Marked delivered.');renderDOs();}
+async function deleteDO(id){if(!isAdmin||!confirm('Delete?'))return;await sb.from('acc_delivery_orders').delete().eq('id',id);showToast('Deleted.');renderDOs();}
+
+// ── PAYMENT VOUCHERS ──────────────────────────────────────────────────────────
+async function renderVouchers(){
+    const {data}=await sb.from('acc_vouchers').select('*').order('created_at',{ascending:false});
+    const pvs=data||[];
+    const total=pvs.reduce((s,v)=>s+(v.amount||0),0);
+    document.getElementById('content').innerHTML=`
+    <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
+        <div class="stat-card"><div class="stat-label">Total Paid Out</div><div class="stat-value" style="font-size:15px">${fmtRM(total)}</div><div class="stat-sub">${pvs.length} vouchers</div></div>
+        <div class="stat-card" style="border-color:#fde68a"><div class="stat-label">Pending Approval</div><div class="stat-value" style="font-size:20px;color:#f59e0b">${pvs.filter(v=>v.status==='pending').length}</div><div class="stat-sub">awaiting</div></div>
+        <div class="stat-card" style="border-color:#6ee7b7"><div class="stat-label">Approved</div><div class="stat-value" style="font-size:20px;color:#10b981">${pvs.filter(v=>v.status==='approved'||v.status==='paid').length}</div><div class="stat-sub">vouchers</div></div>
+    </div>
+    <div class="tbl-wrap">
+        <div class="tbl-head"><span class="tbl-title">Payment Vouchers (${pvs.length})</span><button class="btn btn-dark btn-sm" onclick="openVoucherModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>New Voucher</button></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>PV No.</th><th>Payee</th><th>Date</th><th>Method</th><th>Amount</th><th>Status</th><th>Approved By</th><th></th></tr></thead><tbody>
+        ${pvs.map(v=>`<tr>
+            <td style="font-weight:700;color:#0d1f0d">${esc(v.pv_number)}</td>
+            <td style="font-weight:600;color:#0f172a">${esc(v.payee)}</td>
+            <td style="color:#94a3b8;font-size:11px">${fmtDate(v.date)}</td>
+            <td style="font-size:11px">${esc(v.payment_method||'—')}</td>
+            <td style="font-family:monospace;font-weight:700">${fmtRM(v.amount)}</td>
+            <td>${badge(v.status)}</td>
+            <td style="font-size:11px;color:#94a3b8">${esc(v.approved_by||'—')}</td>
+            <td onclick="event.stopPropagation()"><div style="display:flex;gap:3px">
+                <button class="btn btn-out btn-xs" onclick="printVoucherPDF('${v.id}')">PDF</button>
+                ${isAdmin&&v.status==='pending'?`<button class="btn btn-green btn-xs" onclick="approveVoucher('${v.id}')">Approve</button>`:''}
+                ${isAdmin?`<button class="btn btn-red btn-xs" onclick="deleteVoucher('${v.id}')">Del</button>`:''}
+            </div></td>
+        </tr>`).join('')||'<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:28px;font-size:12px">No vouchers yet.</td></tr>'}
+        </tbody></table></div>
+    </div>`;
+    lucide.createIcons();
+}
+
+async function openVoucherModal(){
+    const nextNum=await autoNumber('acc_vouchers','pv_number','CBX-PV');
+    showModal(`<div class="modal">
+        <div class="modal-hd"><div class="modal-title">New Payment Voucher</div></div>
+        <div class="modal-body">
+            <div class="fr2"><div class="fg"><label class="fl">PV No.</label><input id="pv_n" class="fi" value="${nextNum}" style="font-family:monospace"></div><div class="fg"><label class="fl">Date</label><input id="pv_d" class="fi" type="date" value="${today()}"></div></div>
+            <div class="fg"><label class="fl">Payee *</label><input id="pv_p" class="fi" placeholder="Name / Company"></div>
+            <div class="fg"><label class="fl">Bank / Account Details</label><textarea id="pv_b" class="fi" rows="2" style="resize:vertical" placeholder="Bank name, account number..."></textarea></div>
+            <div class="fr2">
+                <div class="fg"><label class="fl">Payment Method</label><select id="pv_m" class="fi"><option value="bank_transfer">Bank Transfer</option><option value="cheque">Cheque</option><option value="cash">Cash</option><option value="online">Online Banking</option><option value="duit_now">DuitNow</option></select></div>
+                <div class="fg"><label class="fl">Total Amount (RM) *</label><input id="pv_a" class="fi" type="number" step="0.01" placeholder="0.00" style="font-family:monospace;text-align:right"></div>
+            </div>
+            <div style="font-size:9px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.08em;padding:7px 0 4px;border-top:2px solid #f1f5f9;margin-top:2px">Payment Description</div>
+            <div id="pv_items"></div>
+            <button class="btn btn-out btn-sm" style="margin:5px 0 10px" onclick="addPVItem()">+ Add Line</button>
+        </div>
+        <div class="modal-foot"><button class="btn btn-out" onclick="closeModal()">Cancel</button><button class="btn btn-dark" onclick="saveVoucher()">Create Voucher</button></div>
+    </div>`);
+    window._pi=[{desc:'',amount:''}];renderPVItems();lucide.createIcons();
+}
+function renderPVItems(){document.getElementById('pv_items').innerHTML=(window._pi||[]).map((it,i)=>`<div style="display:grid;grid-template-columns:1fr 100px 22px;gap:4px;align-items:center;margin-bottom:4px"><input class="fi" style="padding:6px 8px;font-size:12px" value="${esc(it.desc)}" oninput="_pi[${i}].desc=this.value" placeholder="Description"><input class="fi" style="padding:6px 8px;font-size:12px;text-align:right;font-family:monospace" type="number" step="0.01" value="${it.amount}" oninput="_pi[${i}].amount=this.value" placeholder="Amount"><button onclick="_pi.splice(${i},1);renderPVItems()" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:15px">×</button></div>`).join('');}
+function addPVItem(){window._pi=[...(window._pi||[]),{desc:'',amount:''}];renderPVItems();}
+async function saveVoucher(){
+    const payee=document.getElementById('pv_p').value,amount=parseFloat(document.getElementById('pv_a').value)||0;
+    if(!payee||!amount){showToast('Payee and amount required','error');return;}
+    const {error}=await sb.from('acc_vouchers').insert({pv_number:document.getElementById('pv_n').value,payee,amount,date:document.getElementById('pv_d').value,bank_details:document.getElementById('pv_b').value,payment_method:document.getElementById('pv_m').value,items:(window._pi||[]).map(it=>({...it,amount:parseFloat(it.amount)||0})),status:'pending'});
+    if(error){showToast('Error: '+error.message,'error');return;}
+    closeModal();showToast('Voucher created.');renderVouchers();
+}
+async function approveVoucher(id){if(!isAdmin)return;await sb.from('acc_vouchers').update({status:'approved',approved_by:currentUser.email}).eq('id',id);showToast('Approved.');renderVouchers();}
+async function deleteVoucher(id){if(!isAdmin||!confirm('Delete?'))return;await sb.from('acc_vouchers').delete().eq('id',id);showToast('Deleted.');renderVouchers();}
+async function printVoucherPDF(id){
+    const {data:v}=await sb.from('acc_vouchers').select('*').eq('id',id).single();if(!v)return;
+    const {jsPDF}=window.jspdf;const doc=new jsPDF();
+    doc.setFont('helvetica','bold').setFontSize(15).text(CO.name,14,22);
+    doc.setFont('helvetica','normal').setFontSize(8).setTextColor(100,100,100);
+    if(CO.address)doc.text(CO.address,14,28);
+    doc.setFont('helvetica','bold').setFontSize(17).setTextColor(0,0,0).text('PAYMENT VOUCHER',196,22,{align:'right'});
+    doc.setFont('helvetica','normal').setFontSize(11).text(v.pv_number,196,30,{align:'right'});
+    doc.setDrawColor(200,200,200).line(14,40,196,40);
+    doc.setFontSize(8).setTextColor(100,100,100).text('Pay To:',14,50);
+    doc.setFont('helvetica','bold').setFontSize(12).setTextColor(0,0,0).text(v.payee,14,57);
+    if(v.bank_details)doc.setFont('helvetica','normal').setFontSize(8).setTextColor(100,100,100).text(v.bank_details,14,63);
+    doc.setFontSize(8).setTextColor(100,100,100).text('Date: '+fmtDate(v.date),130,50);
+    doc.text('Method: '+(v.payment_method||'—'),130,57);
+    doc.setFont('helvetica','bold').setFontSize(14).setTextColor(0,0,0).text(fmtRM(v.amount),196,65,{align:'right'});
+    doc.autoTable({startY:75,head:[['Description','Amount (RM)']],body:(v.items||[]).map(it=>[it.desc,parseFloat(it.amount||0).toFixed(2)]),theme:'striped',headStyles:{fillColor:[13,31,13],fontSize:9},bodyStyles:{fontSize:10},columnStyles:{1:{halign:'right',fontStyle:'bold'}}});
+    const fy=doc.lastAutoTable.finalY+8;
+    doc.setFont('helvetica','bold').setFontSize(12).text('TOTAL: '+fmtRM(v.amount),196,fy,{align:'right'});
+    if(v.approved_by)doc.setFont('helvetica','normal').setFontSize(8).setTextColor(100,100,100).text('Approved by: '+v.approved_by,14,fy+18);
+    doc.setFontSize(7).setTextColor(150,150,150).text('Computer-generated — CARBONEX VENTURES SDN. BHD.',14,282);
+    doc.save(v.pv_number+'.pdf');
+}
+
+// ── CREDIT / DEBIT NOTES ──────────────────────────────────────────────────────
+async function renderCreditNotes(){
+    const [nr,cr]=await Promise.all([sb.from('acc_credit_notes').select('*').order('created_at',{ascending:false}),sb.from('acc_customers').select('id,name')]);
+    const notes=nr.data||[],cmap=Object.fromEntries((cr.data||[]).map(c=>[c.id,c.name]));
+    document.getElementById('content').innerHTML=`
+    <div class="tbl-wrap">
+        <div class="tbl-head"><span class="tbl-title">Credit / Debit Notes (${notes.length})</span><button class="btn btn-dark btn-sm" onclick="openCNModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>New Note</button></div>
+        <table><thead><tr><th>Note No.</th><th>Type</th><th>Customer</th><th>Date</th><th>Invoice Ref</th><th>Amount</th><th>Reason</th><th>Status</th><th></th></tr></thead><tbody>
+        ${notes.map(n=>`<tr>
+            <td style="font-weight:700;color:#0d1f0d">${esc(n.cn_number)}</td>
+            <td>${badge(n.type)}</td><td>${esc(cmap[n.customer_id]||'—')}</td>
+            <td style="color:#94a3b8;font-size:11px">${fmtDate(n.date)}</td>
+            <td style="font-family:monospace;font-size:11px">${esc(n.invoice_ref||'—')}</td>
+            <td style="font-family:monospace;font-weight:700">${fmtRM(n.amount)}</td>
+            <td style="font-size:11px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(n.reason||'—')}</td>
+            <td>${badge(n.status)}</td>
+            <td onclick="event.stopPropagation()">${isAdmin?`<button class="btn btn-red btn-xs" onclick="deleteCN('${n.id}')">Del</button>`:''}</td>
+        </tr>`).join('')||'<tr><td colspan="9" style="text-align:center;color:#94a3b8;padding:28px;font-size:12px">No notes yet.</td></tr>'}
+        </tbody></table>
+    </div>`;
+    lucide.createIcons();
+}
+
+async function openCNModal(){
+    const [cr,ir]=await Promise.all([sb.from('acc_customers').select('id,name'),sb.from('acc_invoices').select('id,inv_number')]);
+    const nextNum=await autoNumber('acc_credit_notes','cn_number','CBX-CN');
+    showModal(`<div class="modal">
+        <div class="modal-hd"><div class="modal-title">New Credit / Debit Note</div></div>
+        <div class="modal-body">
+            <div class="fr3">
+                <div class="fg"><label class="fl">Note No.</label><input id="cn_n" class="fi" value="${nextNum}" style="font-family:monospace"></div>
+                <div class="fg"><label class="fl">Type</label><select id="cn_t" class="fi"><option value="credit">Credit Note</option><option value="debit">Debit Note</option></select></div>
+                <div class="fg"><label class="fl">Date</label><input id="cn_d" class="fi" type="date" value="${today()}"></div>
+            </div>
+            <div class="fr2">
+                <div class="fg"><label class="fl">Customer *</label><select id="cn_c" class="fi"><option value="">Select...</option>${(cr.data||[]).map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')}</select></div>
+                <div class="fg"><label class="fl">Invoice Reference</label><select id="cn_i" class="fi"><option value="">None</option>${(ir.data||[]).map(i=>`<option value="${i.inv_number}">${esc(i.inv_number)}</option>`).join('')}</select></div>
+            </div>
+            <div class="fg"><label class="fl">Amount (RM) *</label><input id="cn_a" class="fi" type="number" step="0.01" placeholder="0.00" style="font-family:monospace;text-align:right"></div>
+            <div class="fg"><label class="fl">Reason / Description *</label><textarea id="cn_r" class="fi" rows="3" style="resize:vertical" placeholder="Reason for this note..."></textarea></div>
+        </div>
+        <div class="modal-foot"><button class="btn btn-out" onclick="closeModal()">Cancel</button><button class="btn btn-dark" onclick="saveCN()">Create Note</button></div>
+    </div>`);
+    lucide.createIcons();
+}
+async function saveCN(){
+    const custId=document.getElementById('cn_c').value,amount=parseFloat(document.getElementById('cn_a').value)||0,reason=document.getElementById('cn_r').value;
+    if(!custId||!amount||!reason){showToast('Fill all required fields','error');return;}
+    const {error}=await sb.from('acc_credit_notes').insert({cn_number:document.getElementById('cn_n').value,type:document.getElementById('cn_t').value,customer_id:custId,date:document.getElementById('cn_d').value,invoice_ref:document.getElementById('cn_i').value,amount,reason,status:'pending',items:[]});
+    if(error){showToast('Error: '+error.message,'error');return;}
+    closeModal();showToast('Note created.');renderCreditNotes();
+}
+async function deleteCN(id){if(!isAdmin||!confirm('Delete?'))return;await sb.from('acc_credit_notes').delete().eq('id',id);showToast('Deleted.');renderCreditNotes();}
+
+// ── AGING REPORT ──────────────────────────────────────────────────────────────
+async function renderAging(){
+    const [ir,cr]=await Promise.all([sb.from('acc_invoices').select('*').in('status',['pending','overdue']),sb.from('acc_customers').select('id,name')]);
+    const invs=ir.data||[],cmap=Object.fromEntries((cr.data||[]).map(c=>[c.id,c.name]));
+    const now=new Date();
+    const aged=invs.map(inv=>{const due=new Date((inv.due_date||inv.date)+'T00:00:00');const days=Math.floor((now-due)/(864e5));return{...inv,days:Math.max(0,days),cn:cmap[inv.customer_id]||'—'};});
+    const buckets=[{l:'Current (0–30)',min:0,max:30,items:[]},{l:'31–60 Days',min:31,max:60,items:[]},{l:'61–90 Days',min:61,max:90,items:[]},{l:'Over 90 Days',min:91,max:Infinity,items:[]}];
+    aged.forEach(inv=>{const b=buckets.find(b=>inv.days>=b.min&&inv.days<=b.max);if(b)b.items.push(inv);});
+    const total=aged.reduce((s,i)=>s+(i.total||0),0);
+    const cols=['#10b981','#f59e0b','#ef4444','#991b1b'],bcols=['#6ee7b7','#fde68a','#fecaca','#fecaca'];
+    document.getElementById('content').innerHTML=`
+    <div class="stat-grid">
+        ${buckets.map((b,i)=>`<div class="stat-card" style="border-color:${bcols[i]}"><div class="stat-label">${b.l}</div><div class="stat-value" style="font-size:15px;color:${cols[i]}">${fmtRM(b.items.reduce((s,x)=>s+(x.total||0),0))}</div><div class="stat-sub">${b.items.length} invoice(s)</div></div>`).join('')}
+    </div>
+    <div class="tbl-wrap" style="margin-bottom:12px"><div class="tbl-head"><span class="tbl-title">Total Outstanding: ${fmtRM(total)}</span></div></div>
+    ${buckets.map((b,bi)=>b.items.length?`<div class="tbl-wrap" style="margin-bottom:12px">
+        <div class="tbl-head"><span class="tbl-title" style="color:${cols[bi]}">${b.l}</span></div>
+        <table><thead><tr><th>Invoice No.</th><th>Customer</th><th>Date</th><th>Due</th><th>Days Overdue</th><th>Amount</th></tr></thead><tbody>
+        ${b.items.map(inv=>`<tr onclick="viewInvoice('${inv.id}')"><td style="font-weight:700;color:#0d1f0d">${esc(inv.inv_number)}</td><td>${esc(inv.cn)}</td><td style="color:#94a3b8;font-size:11px">${fmtDate(inv.date)}</td><td style="color:#ef4444;font-size:11px">${fmtDate(inv.due_date)}</td><td style="font-weight:700;color:${inv.days>60?'#ef4444':inv.days>30?'#f59e0b':'#10b981'}">${inv.days} days</td><td style="font-family:monospace;font-weight:700">${fmtRM(inv.total)}</td></tr>`).join('')}
+        </tbody></table>
+    </div>`:'').join('')||'<div style="text-align:center;padding:40px;color:#10b981;font-size:13px;font-weight:600">✓ No outstanding invoices!</div>'}`;
+    lucide.createIcons();
+}
+
+// ── SST SUMMARY ───────────────────────────────────────────────────────────────
+async function renderSST(){
+    const {data:invs}=await sb.from('acc_invoices').select('*').eq('status','paid');
+    const all=invs||[];
+    let s6=0,st10=0,st5=0;
+    all.forEach(inv=>(inv.items||[]).forEach(it=>{const line=(it.qty||0)*(it.unit_price||0);if(it.sst_code==='S6')s6+=line*0.06;if(it.sst_code==='ST10')st10+=line*0.10;if(it.sst_code==='ST5')st5+=line*0.05;}));
+    const totalSST=s6+st10+st5;
+    document.getElementById('content').innerHTML=`
+    <div class="stat-grid">
+        <div class="stat-card" style="border-color:#fde68a"><div class="stat-label">Total SST Collected</div><div class="stat-value" style="font-size:15px;color:#f59e0b">${fmtRM(totalSST)}</div><div class="stat-sub">${all.length} paid invoices</div></div>
+        <div class="stat-card"><div class="stat-label">Service Tax 6% (S6)</div><div class="stat-value" style="font-size:15px">${fmtRM(s6)}</div><div class="stat-sub">S6 code</div></div>
+        <div class="stat-card"><div class="stat-label">Sales Tax 10% (ST10)</div><div class="stat-value" style="font-size:15px">${fmtRM(st10)}</div><div class="stat-sub">ST10 code</div></div>
+        <div class="stat-card"><div class="stat-label">Sales Tax 5% (ST5)</div><div class="stat-value" style="font-size:15px">${fmtRM(st5)}</div><div class="stat-sub">ST5 code</div></div>
+    </div>
+    <div class="tbl-wrap">
+        <div class="tbl-head"><span class="tbl-title">Paid Invoices — SST Breakdown</span></div>
+        <div style="overflow-x:auto"><table><thead><tr><th>Invoice No.</th><th>Date</th><th>Subtotal</th><th>S6 (6%)</th><th>ST10 (10%)</th><th>ST5 (5%)</th><th>Total SST</th><th>Invoice Total</th></tr></thead><tbody>
+        ${all.map(inv=>{let iS6=0,iST10=0,iST5=0;(inv.items||[]).forEach(it=>{const line=(it.qty||0)*(it.unit_price||0);if(it.sst_code==='S6')iS6+=line*0.06;if(it.sst_code==='ST10')iST10+=line*0.10;if(it.sst_code==='ST5')iST5+=line*0.05;});const tSST=iS6+iST10+iST5;return`<tr><td style="font-weight:700;color:#0d1f0d">${esc(inv.inv_number)}</td><td style="color:#94a3b8;font-size:11px">${fmtDate(inv.date)}</td><td style="font-family:monospace">${fmtRM(inv.subtotal)}</td><td style="font-family:monospace;color:#f59e0b">${iS6>0?fmtRM(iS6):'—'}</td><td style="font-family:monospace;color:#f59e0b">${iST10>0?fmtRM(iST10):'—'}</td><td style="font-family:monospace;color:#f59e0b">${iST5>0?fmtRM(iST5):'—'}</td><td style="font-family:monospace;font-weight:700;color:#f59e0b">${fmtRM(tSST)}</td><td style="font-family:monospace;font-weight:700">${fmtRM(inv.total)}</td></tr>`;}).join('')||'<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:28px;font-size:12px">No paid invoices yet.</td></tr>'}
+        </tbody></table></div>
+    </div>`;
+    lucide.createIcons();
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
