@@ -136,6 +136,7 @@
         const EMAIL_KEY      = 'mAu312S8UzSdtFZuk';
         const ADMIN_EMAILS   = ['hiu.fs.itake@gmail.com'];
         const APPROVER_MAP   = { 'hiu.fs.itake@gmail.com': 'HFS' };
+        const ATTN = 'Attn: Ir. Tian Foon Howe';
         const CO = {
             name: 'CARBONEX VENTURES SDN. BHD.',
             reg:  'YOUR_SSM_REG_NUMBER',
@@ -317,18 +318,26 @@
             const{jsPDF}=window.jspdf;const doc=new jsPDF();
             doc.setFont('helvetica','bold').setFontSize(14).text(CO.name,14,25);
             doc.setFontSize(8).setFont('helvetica','normal');
-            if(CO.reg&&CO.reg!=='YOUR_SSM_REG_NUMBER')doc.text('Reg No: '+CO.reg,14,30);
-            const addr=doc.splitTextToSize(CO.address,100);doc.text(addr,14,34);
-            const addrH=addr.length*4;
-            doc.text('Tel: '+CO.tel+' | Email: '+CO.email,14,34+addrH);
+            let y=30;
+            if(CO.reg&&CO.reg!=='YOUR_SSM_REG_NUMBER'){doc.text('Company Reg. No.: '+CO.reg,14,y);y+=4;}
+            const addr=doc.splitTextToSize(CO.address,100);doc.text(addr,14,y);y+=addr.length*4;
+            doc.text('Tel: '+CO.tel+' | Email: '+CO.email,14,y);y+=4;
+            doc.setFont('helvetica','bold').text(ATTN,14,y);y+=8;
             doc.setFont('helvetica','bold').text(`CASH CLAIM: ${data.claim_number}`,130,25);
-            doc.text(`Date: ${new Date(data.submission_date).toLocaleDateString('en-GB')}`,130,30);
-            doc.autoTable({startY:50+addrH,body:[['Claimant',data.claimant_name,'Payable To',data.payable_name],['NRIC',data.claimant_nric,'Project',data.project],['Phone',data.claimant_phone||'-','Email',data.claimant_email||'-'],[{content:'Bank Info',styles:{fontStyle:'bold'}},{content:data.bank_details,colSpan:3}]],theme:'plain',styles:{fontSize:9,cellPadding:1.5},columnStyles:{0:{fontStyle:'bold',width:25},2:{fontStyle:'bold',width:25}}});
+            doc.setFont('helvetica','normal').text(`Date: ${new Date(data.submission_date).toLocaleDateString('en-GB')}`,130,30);
+            doc.autoTable({startY:Math.max(50,y),body:[['Claimant',data.claimant_name,'Payable To',data.payable_name],['NRIC',data.claimant_nric,'Project',data.project],['Phone',data.claimant_phone||'-','Email',data.claimant_email||'-'],[{content:'Bank Info',styles:{fontStyle:'bold'}},{content:data.bank_details,colSpan:3}]],theme:'plain',styles:{fontSize:9,cellPadding:1.5},columnStyles:{0:{fontStyle:'bold',width:25},2:{fontStyle:'bold',width:25}}});
             doc.autoTable({startY:doc.lastAutoTable.finalY+5,head:[['No.','Description','Qty','Unit Price (RM)','Total RM']],body:data.items.map((i,idx)=>[idx+1,i.desc,i.qty,formatRM(i.price),formatRM(i.qty*i.price)]),theme:'grid',headStyles:{fillColor:[13,31,13]},styles:{fontSize:8},columnStyles:{3:{halign:'right'},4:{halign:'right'}}});
             const finalY=doc.lastAutoTable.finalY;
-            doc.setFont('helvetica','bold').text(`TOTAL: RM ${formatRM(data.total_amount)}`,196,finalY+10,{align:'right'});
-            if(preview){doc.setTextColor(26,107,74);doc.text('PREVIEW — NOT SUBMITTED',196,finalY+20,{align:'right'});doc.setTextColor(0,0,0);}
-            else if(data.approved_by)doc.setFontSize(8).setFont('helvetica','italic').text(`Digitally approved by ${data.approved_by}. No signature required.`,14,finalY+20);
+            doc.setFont('helvetica','bold').setFontSize(11).text(`TOTAL: RM ${formatRM(data.total_amount)}`,196,finalY+10,{align:'right'});
+            if(preview){
+                doc.setTextColor(26,107,74);doc.setFontSize(14).setFont('helvetica','bold');
+                doc.text('PREVIEW - NOT SUBMITTED',196,finalY+20,{align:'right'});doc.setTextColor(0,0,0);
+            }else if(data.status==='Pending'){
+                doc.setTextColor(220,38,38);doc.setFontSize(14).setFont('helvetica','bold');
+                doc.text('DRAFT - FOR REVIEW ONLY',196,finalY+20,{align:'right'});doc.setTextColor(0,0,0);
+            }
+            const printDate=new Date().toLocaleString('en-GB');
+            doc.setFontSize(9).setFont('helvetica','italic').text(`This Cash Claim is digitally approved by ${data.approved_by||'DRAFT'} on ${printDate}. No signature required.`,14,finalY+30);
             return doc;
         }
 
