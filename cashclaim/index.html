@@ -233,7 +233,7 @@
 
         async function handleStatusChange(id,newStatus){
             if(!currentApproverInitials){alert('Your account is not mapped to an approver. Contact admin.');return;}
-            const cc=currentClaims.find(c=>c.id===id);
+            const cc=currentClaims.find(c=>String(c.id)===String(id));
             const{error}=await supabaseClient.from('cash_claims').update({status:newStatus,approved_by:currentApproverInitials}).eq('id',id);
             if(error){alert('Database Error: '+error.message);return;}
             if(cc){const color=newStatus==='Approved'?'#1a6b4a':'#ef4444';emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{system_name:'CARBONEX CASH CLAIM',header_bg:color,title:`Claim ${newStatus}`,to_email:cc.claimant_email,to_name:cc.claimant_name,html_body:mkRow('Claim No',cc.claim_number)+mkRow('Status',newStatus.toUpperCase())+mkRow('Action By',currentApproverInitials)+mkRow('Total','RM '+formatRM(cc.total_amount)),remark_text:document.getElementById('reason-'+id)?.value||(newStatus==='Approved'?'Claim approved.':'Claim rejected.')});}
@@ -241,7 +241,7 @@
         }
 
         function loadClaimForEdit(id){
-            const cc=currentClaims.find(c=>c.id===id);if(!cc)return;
+            const cc=currentClaims.find(c=>String(c.id)===String(id));if(!cc)return;
             editingId=id;
             document.getElementById('claim-no').value=cc.claim_number;
             document.getElementById('claim-date').value=cc.submission_date;
@@ -333,7 +333,7 @@
         }
 
         async function generatePDF(id){
-            const data=currentClaims.find(c=>c.id===id);if(!data)return;
+            const data=currentClaims.find(c=>String(c.id)===String(id));if(!data)return;
             buildClaimPDF(data,false).save(`${data.claim_number}.pdf`);
         }
 
