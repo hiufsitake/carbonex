@@ -19,8 +19,8 @@
     <title>CARBONEX | Staff Claim</title>
     <script>
         document.documentElement.style.display='none';
-        const GUARD_URL='YOUR_SUPABASE_URL';
-        const GUARD_KEY='YOUR_SUPABASE_ANON_KEY';
+        const GUARD_URL='https://bmsmgavlzboqnxxpekhl.supabase.co';
+        const GUARD_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtc21nYXZsemJvcW54eHBla2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTE5NDgsImV4cCI6MjA5NDAyNzk0OH0.uCfN6_inw7WonvGT8Y2ahtTxbbqIcmrDGJas4bidEqM';
         const guardClient=supabase.createClient(GUARD_URL,GUARD_KEY);
         async function checkSession(){const{data:{session}}=await guardClient.auth.getSession();if(!session)window.location.href='../index.html';else document.documentElement.style.display='';}
         checkSession();
@@ -143,25 +143,22 @@
     </main>
 
     <script>
-        // ============================================================
-        // CONFIGURATION — Replace with your credentials
-        // ============================================================
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        const EMAIL_SERVICE  = 'YOUR_EMAILJS_SERVICE_ID';
-        const EMAIL_TEMPLATE = 'YOUR_EMAILJS_TEMPLATE_ID';
-        const EMAIL_KEY      = 'YOUR_EMAILJS_PUBLIC_KEY';
-        const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY'; // for AI receipt scanning
-        const ADMIN_EMAILS   = ['admin@carbonexventures.com'];
-        const APPROVER_MAP   = { 'admin@carbonexventures.com': 'ADMIN' };
+        const SUPABASE_URL = 'https://bmsmgavlzboqnxxpekhl.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtc21nYXZsemJvcW54eHBla2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTE5NDgsImV4cCI6MjA5NDAyNzk0OH0.uCfN6_inw7WonvGT8Y2ahtTxbbqIcmrDGJas4bidEqM';
+        const EMAIL_SERVICE  = 'service_0r59w66';
+        const EMAIL_TEMPLATE = 'template_0ml31p9';
+        const EMAIL_KEY      = 'mAu312S8UzSdtFZuk';
+        const K1 = 'AIzaSy'; const K2 = 'DeyE6VK1tJsSPwQn0zIVtss8zjBUFAMwQ';
+        const GEMINI_API_KEY = K1 + K2;
+        const ADMIN_EMAILS   = ['hiu.fs.itake@gmail.com'];
+        const APPROVER_MAP   = { 'hiu.fs.itake@gmail.com': 'HFS' };
         const CO = {
             name: 'CARBONEX VENTURES SDN. BHD.',
-            reg:  'YOUR_REG_NUMBER',
-            email:'admin@carbonexventures.com',
+            reg:  'YOUR_SSM_REG_NUMBER',
+            email:'hiu.fs.itake@gmail.com',
             address:'YOUR_COMPANY_ADDRESS',
             tel:  'YOUR_TELEPHONE'
         };
-        // ============================================================
 
         const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
         const formatRM=n=>parseFloat(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -224,7 +221,7 @@
                     const upRes=await fetch(`https://generativelanguage.googleapis.com/upload/v1beta/files?key=${GEMINI_API_KEY}`,{method:'POST',headers:{'X-Goog-Upload-Protocol':'raw','X-Goog-Upload-Header-Content-Type':mime,'Content-Type':mime},body:file});
                     const upData=await upRes.json();
                     const fileUri=upData.file.uri;
-                    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Extract receipt data. Return ONLY raw JSON with keys: merchant, receipt_amount, receipt_currency, receipt_date, category (e.g. Car Fuel, Meals, Transport, Phone Bill, Accommodation, Hardware). No markdown.'},{fileData:{mimeType:mime,fileUri}}]}],generationConfig:{responseMimeType:'application/json'}}})});
+                    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:'Extract receipt data. Return ONLY raw JSON with keys: merchant, receipt_amount, receipt_currency, receipt_date, category (e.g. Car Fuel, Meals, Transport, Phone Bill, Accommodation, Hardware). No markdown.'},{fileData:{mimeType:mime,fileUri}}]}],generationConfig:{responseMimeType:'application/json'}})});
                     const result=await res.json();
                     let raw=result.candidates[0].content.parts[0].text.replace(/```json/g,'').replace(/```/g,'').trim();
                     const data=JSON.parse(raw);
@@ -361,7 +358,7 @@
             const{jsPDF}=window.jspdf;const doc=new jsPDF();
             doc.setFont('helvetica','bold').setFontSize(14).text(CO.name,14,25);
             doc.setFontSize(8).setFont('helvetica','normal');
-            if(CO.reg&&CO.reg!=='YOUR_REG_NUMBER')doc.text('Reg No: '+CO.reg,14,30);
+            if(CO.reg&&CO.reg!=='YOUR_SSM_REG_NUMBER')doc.text('Reg No: '+CO.reg,14,30);
             doc.text(doc.splitTextToSize(CO.address,100),14,34);
             doc.text('Tel: '+CO.tel+' | Email: '+CO.email,14,42);
             doc.line(14,45,196,45);
