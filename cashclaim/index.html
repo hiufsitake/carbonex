@@ -19,8 +19,8 @@
     <title>CARBONEX | Cash Claim</title>
     <script>
         document.documentElement.style.display='none';
-        const GUARD_URL='YOUR_SUPABASE_URL';
-        const GUARD_KEY='YOUR_SUPABASE_ANON_KEY';
+        const GUARD_URL='https://bmsmgavlzboqnxxpekhl.supabase.co';
+        const GUARD_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtc21nYXZsemJvcW54eHBla2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTE5NDgsImV4cCI6MjA5NDAyNzk0OH0.uCfN6_inw7WonvGT8Y2ahtTxbbqIcmrDGJas4bidEqM';
         const guardClient=supabase.createClient(GUARD_URL,GUARD_KEY);
         async function checkSession(){const{data:{session}}=await guardClient.auth.getSession();if(!session)window.location.href='../index.html';else document.documentElement.style.display='';}
         checkSession();
@@ -129,24 +129,20 @@
     </main>
 
     <script>
-        // ============================================================
-        // CONFIGURATION — Replace with your credentials
-        // ============================================================
-        const SUPABASE_URL = 'YOUR_SUPABASE_URL';
-        const SUPABASE_KEY = 'YOUR_SUPABASE_ANON_KEY';
-        const EMAIL_SERVICE  = 'YOUR_EMAILJS_SERVICE_ID';
-        const EMAIL_TEMPLATE = 'YOUR_EMAILJS_TEMPLATE_ID';
-        const EMAIL_KEY      = 'YOUR_EMAILJS_PUBLIC_KEY';
-        const ADMIN_EMAILS   = ['admin@carbonexventures.com'];
-        const APPROVER_MAP   = { 'admin@carbonexventures.com': 'ADMIN' };
+        const SUPABASE_URL = 'https://bmsmgavlzboqnxxpekhl.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJtc21nYXZsemJvcW54eHBla2hsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg0NTE5NDgsImV4cCI6MjA5NDAyNzk0OH0.uCfN6_inw7WonvGT8Y2ahtTxbbqIcmrDGJas4bidEqM';
+        const EMAIL_SERVICE  = 'service_0r59w66';
+        const EMAIL_TEMPLATE = 'template_0ml31p9';
+        const EMAIL_KEY      = 'mAu312S8UzSdtFZuk';
+        const ADMIN_EMAILS   = ['hiu.fs.itake@gmail.com'];
+        const APPROVER_MAP   = { 'hiu.fs.itake@gmail.com': 'HFS' };
         const CO = {
             name: 'CARBONEX VENTURES SDN. BHD.',
-            reg:  'YOUR_REG_NUMBER',
-            email:'admin@carbonexventures.com',
+            reg:  'YOUR_SSM_REG_NUMBER',
+            email:'hiu.fs.itake@gmail.com',
             address:'YOUR_COMPANY_ADDRESS',
             tel:  'YOUR_TELEPHONE'
         };
-        // ============================================================
 
         const supabaseClient=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
         const formatRM=n=>parseFloat(n||0).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -321,7 +317,7 @@
             const{jsPDF}=window.jspdf;const doc=new jsPDF();
             doc.setFont('helvetica','bold').setFontSize(14).text(CO.name,14,25);
             doc.setFontSize(8).setFont('helvetica','normal');
-            if(CO.reg&&CO.reg!=='YOUR_REG_NUMBER')doc.text('Reg No: '+CO.reg,14,30);
+            if(CO.reg&&CO.reg!=='YOUR_SSM_REG_NUMBER')doc.text('Reg No: '+CO.reg,14,30);
             const addr=doc.splitTextToSize(CO.address,100);doc.text(addr,14,34);
             const addrH=addr.length*4;
             doc.text('Tel: '+CO.tel+' | Email: '+CO.email,14,34+addrH);
