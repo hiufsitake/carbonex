@@ -311,13 +311,13 @@
             const remark=document.getElementById('reason-'+id)?.value||'';
             const{error}=await supabaseClient.from('staff_claims').update({status:newStatus,approved_by:currentApproverInitials,approved_at:now}).eq('id',id);
             if(error){alert('Error: '+error.message);return;}
-            const pc=currentClaims.find(c=>c.id===id);
+            const pc=currentClaims.find(c=>String(c.id)===String(id));
             if(pc){const color=newStatus==='Approved'?'#4a7a2d':'#ef4444';emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{system_name:'CARBONEX STAFF CLAIM',header_bg:color,title:`Staff Claim ${newStatus}`,to_email:pc.staff_email,html_body:mkRow('Claim No',pc.claim_number)+mkRow('Status',newStatus.toUpperCase())+mkRow('Action By',currentApproverInitials)+mkRow('Total','RM '+formatRM(pc.total_amount)),remark_text:remark||(newStatus==='Approved'?'Claim approved.':'Claim rejected.')});}
             fetchRecords();
         }
 
         function loadForEdit(id){
-            const pc=currentClaims.find(c=>c.id===id);if(!pc)return;
+            const pc=currentClaims.find(c=>String(c.id)===String(id));if(!pc)return;
             document.getElementById('edit-id').value=pc.id;
             document.getElementById('staff-name').value=pc.staff_name;
             document.getElementById('staff-email').value=pc.staff_email;
@@ -375,7 +375,7 @@
         }
 
         async function generatePDF(id){
-            const data=currentClaims.find(c=>c.id===id);if(!data)return;
+            const data=currentClaims.find(c=>String(c.id)===String(id));if(!data)return;
             buildPDF(data,false).save(`${data.claim_number}.pdf`);
         }
 
