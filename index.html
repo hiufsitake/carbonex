@@ -178,8 +178,9 @@
             if (!isResetMode && !password) { errorMsg.innerText = 'Please enter your password.'; errorMsg.classList.remove('hidden'); return; }
             btn.innerHTML = '<span class="animate-pulse">Processing...</span>';
             errorMsg.classList.add('hidden');
+            const baseUrl = window.location.origin + window.location.pathname;
             if (isResetMode) {
-                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: window.location.href });
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email, { redirectTo: baseUrl });
                 if (error) { errorMsg.innerText = error.message; errorMsg.classList.remove('hidden'); btn.innerText = 'Send Reset Link'; }
                 else { alert('Reset link sent! Check your email.'); toggleResetMode(); }
                 return;
@@ -189,7 +190,7 @@
                 const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
                 if (error) { sessionStorage.removeItem('cbx_tab_session'); errorMsg.innerText = error.message; errorMsg.classList.remove('hidden'); btn.innerText = 'Login'; }
             } else {
-                const { error } = await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: window.location.href } });
+                const { error } = await supabaseClient.auth.signUp({ email, password, options: { emailRedirectTo: baseUrl } });
                 if (error) { errorMsg.innerText = error.message; errorMsg.classList.remove('hidden'); btn.innerText = 'Sign Up'; }
                 else { alert('Account created! Check your email to confirm.'); toggleAuthMode(); btn.innerText = 'Login'; }
             }
