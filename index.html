@@ -121,6 +121,12 @@
         const INACTIVITY_LIMIT = 10 * 60 * 1000;
         window.currentAuthEmail = 'Unknown';
 
+        async function keepAlive() {
+            try { await supabaseClient.from('settings').select('key').limit(1); } catch(e) {}
+        }
+        keepAlive();
+        setInterval(keepAlive, 5 * 60 * 1000);
+
         async function initPortal() {
             const backupTimer = setTimeout(() => {
                 document.getElementById('app-loader').classList.add('fade-out');
