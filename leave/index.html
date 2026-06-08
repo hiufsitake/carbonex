@@ -22,6 +22,7 @@
   .tab-btn.active { background: var(--accent); color: #fff; }
   .tab-btn:not(.active) { color: #4b5563; }
   .tab-btn:not(.active):hover { background: #f3f4f6; }
+  .tab-active { background: #1a4a1a; color: white; box-shadow: 0 4px 12px rgba(26,74,26,0.4); }
   .card { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
   .btn-primary { background: var(--accent); color: #fff; border-radius: 8px; padding: 8px 18px; font-size: 14px; font-weight: 600; transition: background 0.2s; }
   .btn-primary:hover { background: var(--accent-light); }
@@ -48,34 +49,23 @@
 
 <div id="app" class="min-h-screen">
   <!-- Nav -->
-  <nav class="nav-bar text-white px-4 py-3 flex items-center justify-between no-print">
-    <div class="flex items-center gap-3">
-      <button onclick="goBack()" class="p-1.5 rounded hover:bg-white/10 transition">
-        <i data-lucide="arrow-left" class="w-5 h-5"></i>
-      </button>
-      <img src="../logo.png" alt="CARBONEX" class="h-8 w-auto">
-      <div>
-        <div class="font-bold text-sm tracking-wide">CARBONEX Leave System</div>
-        <div class="text-xs opacity-60">CARBONEX VENTURES SDN. BHD.</div>
+  <nav class="bg-[#0d1f0d] text-white p-5 sticky top-0 z-50 shadow-xl border-b-2 border-[#1a4a1a] no-print">
+    <div class="max-w-5xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <a href="../index.html" class="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></a>
+        <div>
+          <h1 class="font-black italic text-base uppercase tracking-tighter leading-none">CARBONEX <span class="text-[#4a9e3f] text-xs">Leave System</span></h1>
+          <p class="text-[8px] text-slate-500 uppercase tracking-widest">Leave Management</p>
+        </div>
+      </div>
+      <div class="flex bg-slate-800 p-1 rounded-xl gap-1 overflow-x-auto">
+        <button class="px-3 py-2 rounded-lg text-[9px] font-bold tab-active uppercase transition-all" id="nav-apply" onclick="switchTab('apply',this)">Apply</button>
+        <button class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all" id="nav-status" onclick="switchTab('status',this)">My Leaves</button>
+        <button class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all" id="nav-calendar" onclick="switchTab('calendar',this)">Calendar</button>
+        <button id="nav-admin" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all hidden" onclick="switchTab('admin',this)">Admin</button>
       </div>
     </div>
-    <div class="flex items-center gap-3">
-      <span id="userEmail" class="text-xs opacity-70 hidden sm:block"></span>
-      <button onclick="signOut()" class="flex items-center gap-1 text-xs px-3 py-1.5 rounded bg-white/10 hover:bg-white/20 transition">
-        <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out
-      </button>
-    </div>
   </nav>
-
-  <!-- Tabs -->
-  <div class="no-print bg-white border-b px-4">
-    <div class="flex gap-1 py-2 max-w-5xl mx-auto overflow-x-auto">
-      <button class="tab-btn active px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="switchTab('apply',this)">Apply Leave</button>
-      <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="switchTab('status',this)">My Leaves</button>
-      <button class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap" onclick="switchTab('calendar',this)">Team Calendar</button>
-      <button id="adminTab" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap hidden" onclick="switchTab('admin',this)">Admin</button>
-    </div>
-  </div>
 
   <div class="max-w-5xl mx-auto px-4 py-6">
 
@@ -322,7 +312,7 @@ async function init() {
   currentUser = session.user;
   document.getElementById('userEmail').textContent = currentUser.email;
   isAdmin = ADMIN_EMAILS.includes(currentUser.email);
-  if (isAdmin) document.getElementById('adminTab').classList.remove('hidden');
+  if (isAdmin) document.getElementById('nav-admin').classList.remove('hidden');
 
   await loadStaffProfile();
   populateYearSelectors();
@@ -784,10 +774,11 @@ function exportCSV() {
 function switchTab(tab, btn) {
   ['apply','status','calendar','admin'].forEach(t => {
     document.getElementById('tab-'+t)?.classList.add('hidden');
+    const nb = document.getElementById('nav-'+t);
+    if (nb) { nb.classList.remove('tab-active'); nb.classList.add('text-slate-400'); }
   });
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab-'+tab)?.classList.remove('hidden');
-  btn.classList.add('active');
+  if (btn) { btn.classList.add('tab-active'); btn.classList.remove('text-slate-400'); }
 
   if (tab === 'status') loadMyLeaves();
   if (tab === 'calendar') loadCalendar();
