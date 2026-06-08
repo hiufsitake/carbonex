@@ -298,6 +298,7 @@
         let promptFired = false;
 
         function showInstallBanner() {
+            if (isStandalone) return;
             if (!localStorage.getItem('cbx_install_dismissed')) {
                 document.getElementById('install-banner').classList.add('banner-visible');
             }
