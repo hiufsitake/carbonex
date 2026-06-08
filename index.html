@@ -292,22 +292,19 @@
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
         function showInstallBanner() {
-            if (!isStandalone && !localStorage.getItem('cbx_install_dismissed')) {
+            if (!localStorage.getItem('cbx_install_dismissed')) {
                 document.getElementById('install-banner').classList.remove('hidden');
             }
         }
 
-        if (!isStandalone) {
-            if (isIOS) {
-                setTimeout(showInstallBanner, 3000);
-            } else {
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    deferredInstallPrompt = e;
-                    showInstallBanner();
-                });
-            }
-        }
+        // Capture the native install prompt when available (for the Install button)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredInstallPrompt = e;
+            showInstallBanner();
+        });
+        // Always show the banner — even if the app is already installed
+        setTimeout(showInstallBanner, 1500);
 
         function triggerInstall() {
             if (isIOS) {
