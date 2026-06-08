@@ -334,6 +334,7 @@
         }
 
         function triggerInstall() {
+            // Native install dialog (Android/desktop Chrome) — same as the website.
             if (deferredInstallPrompt) {
                 deferredInstallPrompt.prompt();
                 deferredInstallPrompt.userChoice.then((choice) => {
@@ -345,10 +346,30 @@
                 });
                 return;
             }
-            // No native prompt available -> show manual instructions over the banner
-            document.getElementById('ios-steps').classList.toggle('hidden', !isIOS);
-            document.getElementById('android-steps').classList.toggle('hidden', isIOS);
-            document.getElementById('ios-install-modal').classList.remove('hidden');
+            // iPhone/iPad: no install API exists, show Add to Home Screen steps.
+            if (isIOS) {
+                document.getElementById('ios-steps').classList.remove('hidden');
+                document.getElementById('android-steps').classList.add('hidden');
+                document.getElementById('ios-install-modal').classList.remove('hidden');
+                return;
+            }
+            // Android/desktop but the native prompt isn't ready yet (or already installed).
+            showInstallToast();
+        }
+
+        let installToastTimer;
+        function showInstallToast() {
+            let t = document.getElementById('install-toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.id = 'install-toast';
+                t.className = 'fixed left-1/2 -translate-x-1/2 bottom-24 z-50 bg-slate-900 text-white text-[11px] font-bold px-4 py-3 rounded-2xl shadow-2xl max-w-[88%] text-center leading-snug';
+                document.body.appendChild(t);
+            }
+            t.textContent = "Open your browser's ⋮ menu and tap “Install app” (or it may already be installed).";
+            t.style.display = 'block';
+            clearTimeout(installToastTimer);
+            installToastTimer = setTimeout(() => { t.style.display = 'none'; }, 4500);
         }
     </script>
 </body>
