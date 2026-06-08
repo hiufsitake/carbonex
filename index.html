@@ -113,9 +113,8 @@
                         <p class="text-[10px] text-green-300 font-bold leading-tight mt-0.5">Add CARBONEX to your home screen</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2 flex-shrink-0">
-                    <button onclick="dismissInstall()" class="text-[10px] font-bold text-gray-400 hover:text-white uppercase px-3 py-2 min-h-[44px]">Later</button>
-                    <button onclick="triggerInstall()" class="bg-[#3f6f4a] hover:bg-[#4f8a5b] text-white font-black text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-xl min-h-[44px] transition-colors">Install</button>
+                <div class="flex items-center flex-shrink-0">
+                    <button onclick="triggerInstall()" class="bg-[#3f6f4a] hover:bg-[#4f8a5b] text-white font-black text-[10px] uppercase tracking-wider px-5 py-2.5 rounded-xl min-h-[44px] transition-colors">Install</button>
                 </div>
             </div>
         </div>
@@ -306,16 +305,16 @@
         let deferredInstallPrompt = null;
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        const DISMISS_KEY = 'cbx_install_dismissed_v2';
-
         // Register service worker — required for Android/Chrome installability
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(() => {});
         }
 
+        // Banner stays visible permanently until the app is installed.
         function showInstallBanner() {
-            if (!isStandalone && !localStorage.getItem(DISMISS_KEY)) {
+            if (!isStandalone) {
                 document.getElementById('install-banner').classList.remove('hidden');
+                document.body.style.paddingBottom = '88px';
             }
         }
 
@@ -330,28 +329,26 @@
             setTimeout(showInstallBanner, 2500);
             window.addEventListener('appinstalled', () => {
                 document.getElementById('install-banner').classList.add('hidden');
+                document.body.style.paddingBottom = '';
             });
         }
 
         function triggerInstall() {
             if (deferredInstallPrompt) {
                 deferredInstallPrompt.prompt();
-                deferredInstallPrompt.userChoice.then(() => {
-                    deferredInstallPrompt = null;
-                    document.getElementById('install-banner').classList.add('hidden');
+                deferredInstallPrompt.userChoice.then((choice) => {
+                    if (choice && choice.outcome === 'accepted') {
+                        deferredInstallPrompt = null;
+                        document.getElementById('install-banner').classList.add('hidden');
+                        document.body.style.paddingBottom = '';
+                    }
                 });
                 return;
             }
-            // No native prompt available -> show manual instructions
-            document.getElementById('install-banner').classList.add('hidden');
+            // No native prompt available -> show manual instructions over the banner
             document.getElementById('ios-steps').classList.toggle('hidden', !isIOS);
             document.getElementById('android-steps').classList.toggle('hidden', isIOS);
             document.getElementById('ios-install-modal').classList.remove('hidden');
-        }
-
-        function dismissInstall() {
-            document.getElementById('install-banner').classList.add('hidden');
-            localStorage.setItem(DISMISS_KEY, '1');
         }
     </script>
 </body>
