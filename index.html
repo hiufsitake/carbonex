@@ -290,44 +290,54 @@
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
+        let promptFired = false;
+
         function showInstallBanner() {
             if (!localStorage.getItem('cbx_install_dismissed')) {
                 document.getElementById('install-banner').classList.remove('hidden');
             }
         }
 
+        function markInstalled() {
+            const btn = document.getElementById('install-btn');
+            if (!btn) return;
+            btn.textContent = 'INSTALLED';
+            btn.disabled = true;
+            btn.classList.remove('bg-[#2d6a27]', 'hover:bg-[#3a8030]');
+            btn.classList.add('bg-slate-500', 'cursor-default');
+        }
+
         // Capture the native install prompt when available (for the Install button)
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredInstallPrompt = e;
+            promptFired = true;
             showInstallBanner();
         });
         // Always show the banner — even if the app is already installed
         setTimeout(showInstallBanner, 1500);
 
-        // If already running as installed PWA, mark button as INSTALLED
-        if (isStandalone) {
-            setTimeout(() => {
-                const btn = document.getElementById('install-btn');
-                if (btn) {
-                    btn.textContent = 'INSTALLED';
-                    btn.disabled = true;
-                    btn.classList.remove('bg-[#2d6a27]', 'hover:bg-[#3a8030]');
-                    btn.classList.add('bg-slate-500', 'cursor-default');
-                }
-            }, 1600);
-        }
+        // Update button when app gets installed in this session
+        window.addEventListener('appinstalled', markInstalled);
 
-        // Also update button when app gets installed in this session
-        window.addEventListener('appinstalled', () => {
-            const btn = document.getElementById('install-btn');
-            if (btn) {
-                btn.textContent = 'INSTALLED';
-                btn.disabled = true;
-                btn.classList.remove('bg-[#2d6a27]', 'hover:bg-[#3a8030]');
-                btn.classList.add('bg-slate-500', 'cursor-default');
+        // Decide whether to show INSTALLED.
+        async function refreshInstallState() {
+            // Running inside the installed PWA window.
+            if (isStandalone) { markInstalled(); return; }
+            // iOS can't report install state — leave the Install button as-is.
+            if (isIOS) return;
+            // Chrome exposes related installed apps where supported.
+            if (navigator.getInstalledRelatedApps) {
+                try {
+                    const apps = await navigator.getInstalledRelatedApps();
+                    if (apps && apps.length) { markInstalled(); return; }
+                } catch (e) {}
             }
-        });
+            // Heuristic: Chrome fires beforeinstallprompt only when the app is
+            // NOT yet installed. If it hasn't fired by now, it's already installed.
+            if (!promptFired) markInstalled();
+        }
+        setTimeout(refreshInstallState, 2500);
 
         function triggerInstall() {
             if (isIOS) {
