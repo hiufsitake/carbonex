@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 360">
+  <!-- Hexagon bonds: pointy-top, center (200,115), radius 65 -->
+  <line x1="200" y1="50"  x2="256" y2="82"  stroke="#5e6a50" stroke-width="5.5" stroke-linecap="round"/>
+  <line x1="256" y1="82"  x2="256" y2="148" stroke="#5e6a50" stroke-width="5.5" stroke-linecap="round"/>
+  <line x1="256" y1="148" x2="200" y2="180" stroke="#5e6a50" stroke-width="5.5" stroke-linecap="round"/>
+  <line x1="200" y1="180" x2="144" y2="148" stroke="#5e6a50" stroke-width="5.5" stroke-linecap="round"/>
+  <line x1="144" y1="148" x2="144" y2="82"  stroke="#5e6a50" stroke-width="5.5" stroke-linecap="round"/>
+  <line x1="144" y1="82"  x2="200" y2="50"  stroke="#5e6a50" stroke-width="5.5" stroke-linecap="round"/>
+
+  <!-- Bottom connector -->
+  <line x1="200" y1="180" x2="200" y2="205" stroke="#5e6a50" stroke-width="5.5" stroke-linecap="round"/>
+  <rect x="181" y="203" width="38" height="13" rx="6.5" fill="#5e6a50"/>
+
+  <!-- Vertex nodes -->
+  <circle cx="200" cy="50"  r="10" fill="#5e6a50"/>
+  <circle cx="256" cy="82"  r="10" fill="#5e6a50"/>
+  <circle cx="256" cy="148" r="10" fill="#5e6a50"/>
+  <circle cx="200" cy="180" r="10" fill="#5e6a50"/>
+  <circle cx="144" cy="148" r="10" fill="#5e6a50"/>
+  <circle cx="144" cy="82"  r="10" fill="#5e6a50"/>
+
+  <!-- Green leaf from top-right vertex -->
+  <path d="M254,76 C278,20 338,10 338,55 C338,90 295,98 254,76 Z" fill="#336621"/>
+  <!-- Leaf midrib -->
+  <path d="M257,78 Q300,48 335,58" stroke="#1f4313" stroke-width="2" fill="none" opacity="0.5"/>
+
+  <!-- CARBONEX -->
+  <text x="280" y="278"
+        font-family="'Arial Black', Arial, sans-serif"
+        font-weight="900"
+        font-size="60"
+        fill="#484e3c"
+        text-anchor="middle"
+        letter-spacing="2">CARBONEX</text>
+
+  <!-- VENTURES SDN. BHD. -->
+  <text x="280" y="312"
+        font-family="Arial, sans-serif"
+        font-weight="700"
+        font-size="21"
+        fill="#2d6618"
+        text-anchor="middle"
+        letter-spacing="3">VENTURES SDN. BHD.</text>
+
+  <!-- 碳索未来 -->
+  <text x="280" y="342"
+        font-family="Arial, sans-serif"
+        font-weight="400"
+        font-size="15"
+        fill="#8a9278"
+        text-anchor="middle"
+        letter-spacing="5">— 碳索未来 —</text>
+</svg>

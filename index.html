@@ -5,37 +5,39 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#0d1f0d">
-    <link rel="apple-touch-icon" href="logo.png">
+    <link rel="apple-touch-icon" href="logo.svg">
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.png" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <title>CARBONEX | Portal</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; padding-bottom: env(safe-area-inset-bottom); }
         #app-loader { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s, visibility 0.5s; }
         #app-loader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
-        .input-box { border: 2px solid #f1f5f9; padding: 1rem; border-radius: 1.25rem; background: #f8fafc; font-weight: 700; width: 100%; outline: none; transition: all 0.2s; }
+        .input-box { border: 2px solid #f1f5f9; padding: 1rem; border-radius: 1.25rem; background: #f8fafc; font-weight: 700; width: 100%; outline: none; transition: all 0.2s; font-size: 16px; }
         .input-box:focus { border-color: #2d6a27; background: white; }
         .nav-card { transition: all 0.2s cubic-bezier(0.4,0,0.2,1); border: 2px solid #f8fafc; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .nav-card:hover { border-color: #2d6a27; transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .nav-card:active { transform: scale(0.97); }
         .hidden-force { display: none !important; }
+        #install-banner { padding-bottom: env(safe-area-inset-bottom); }
     </style>
 </head>
 <body class="bg-white min-h-screen flex flex-col items-center justify-center p-6 relative overflow-x-hidden">
 
     <div id="app-loader">
-        <img src="logo.png" alt="CARBONEX" class="w-48 animate-pulse mb-4" onerror="this.style.display='none'">
+        <img src="logo.svg" alt="CARBONEX" class="w-40 animate-pulse mb-4" onerror="this.style.display='none'">
         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400">Loading System...</p>
     </div>
 
     <div class="w-full max-w-md space-y-10 text-center">
         <div class="flex flex-col items-center">
-            <img src="logo.png" alt="Carbonex Ventures" class="w-72 md:w-80 h-auto object-contain mb-4" onerror="this.outerHTML='<div class=&quot;text-center mb-4&quot;><h1 class=&quot;text-3xl font-black uppercase text-[#0d1f0d]&quot;>CARBONEX</h1><p class=&quot;text-sm font-black text-[#2d6a27] uppercase tracking-widest&quot;>VENTURES SDN. BHD.</p><p class=&quot;text-xs text-slate-400 mt-1&quot;>碳索未来</p></div>'">
+            <img src="logo.svg" alt="Carbonex Ventures" class="w-64 sm:w-72 md:w-80 h-auto object-contain mb-4">
             <div class="h-1 w-12 bg-[#2d6a27] rounded-full mb-2"></div>
             <p class="text-[11px] font-black uppercase tracking-[0.5em] text-slate-400">Operations Portal</p>
         </div>
@@ -95,6 +97,51 @@
             <button onclick="handleLogout()" class="text-[10px] font-bold text-red-300 hover:text-red-500 uppercase tracking-widest flex items-center justify-center gap-2 mx-auto pt-2">
                 <i data-lucide="log-out" class="w-4 h-4"></i> Sign Out
             </button>
+        </div>
+
+        <!-- PWA Install Banner -->
+        <div id="install-banner" class="hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1f0d] text-white shadow-2xl">
+            <div class="flex items-center justify-between gap-3 px-5 py-4 max-w-md mx-auto">
+                <div class="flex items-center gap-3">
+                    <img src="logo.svg" class="w-10 h-10 object-contain flex-shrink-0" alt="">
+                    <div class="text-left">
+                        <p class="text-xs font-black uppercase tracking-wider leading-tight">Install App</p>
+                        <p class="text-[10px] text-green-300 font-bold leading-tight mt-0.5">Add CARBONEX to your home screen</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2 flex-shrink-0">
+                    <button onclick="dismissInstall()" class="text-[10px] font-bold text-gray-400 hover:text-white uppercase px-3 py-2 min-h-[44px]">Later</button>
+                    <button onclick="triggerInstall()" class="bg-[#2d6a27] hover:bg-[#3a8030] text-white font-black text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-xl min-h-[44px] transition-colors">Install</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- iOS Install Guide Modal -->
+        <div id="ios-install-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-end">
+            <div class="bg-white rounded-t-3xl p-6 w-full shadow-2xl">
+                <div class="flex items-center gap-3 mb-4">
+                    <img src="logo.svg" class="w-12 h-12 object-contain" alt="">
+                    <div>
+                        <h3 class="font-black text-slate-800 text-sm uppercase tracking-wider">Install CARBONEX</h3>
+                        <p class="text-[10px] text-slate-500 font-bold">Add to your iPhone home screen</p>
+                    </div>
+                </div>
+                <ol class="text-xs text-slate-700 font-bold space-y-3 mb-5">
+                    <li class="flex items-start gap-3">
+                        <span class="bg-[#2d6a27] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">1</span>
+                        <span>Tap the <strong>Share</strong> button <strong>(□↑)</strong> at the bottom of Safari</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="bg-[#2d6a27] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">2</span>
+                        <span>Scroll down and tap <strong>Add to Home Screen</strong></span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="bg-[#2d6a27] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">3</span>
+                        <span>Tap <strong>Add</strong> to confirm</span>
+                    </li>
+                </ol>
+                <button onclick="document.getElementById('ios-install-modal').classList.add('hidden')" class="w-full bg-[#0d1f0d] text-white font-black text-xs uppercase tracking-wider p-4 rounded-2xl min-h-[52px]">Got it</button>
+            </div>
         </div>
 
         <footer class="pt-6 pb-10 flex flex-col items-center gap-1 text-center">
@@ -234,6 +281,49 @@
         document.getElementById('password').addEventListener('keypress', (e) => { if (e.key === 'Enter') handleAuth(); });
         lucide.createIcons();
         window.onload = initPortal;
+
+        // PWA Install
+        let deferredInstallPrompt = null;
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
+        function showInstallBanner() {
+            if (!isStandalone && !localStorage.getItem('cbx_install_dismissed')) {
+                document.getElementById('install-banner').classList.remove('hidden');
+            }
+        }
+
+        if (!isStandalone) {
+            if (isIOS) {
+                setTimeout(showInstallBanner, 3000);
+            } else {
+                window.addEventListener('beforeinstallprompt', (e) => {
+                    e.preventDefault();
+                    deferredInstallPrompt = e;
+                    showInstallBanner();
+                });
+            }
+        }
+
+        function triggerInstall() {
+            if (isIOS) {
+                document.getElementById('install-banner').classList.add('hidden');
+                document.getElementById('ios-install-modal').classList.remove('hidden');
+                return;
+            }
+            if (deferredInstallPrompt) {
+                deferredInstallPrompt.prompt();
+                deferredInstallPrompt.userChoice.then(() => {
+                    deferredInstallPrompt = null;
+                    document.getElementById('install-banner').classList.add('hidden');
+                });
+            }
+        }
+
+        function dismissInstall() {
+            document.getElementById('install-banner').classList.add('hidden');
+            localStorage.setItem('cbx_install_dismissed', '1');
+        }
     </script>
 </body>
 </html>
