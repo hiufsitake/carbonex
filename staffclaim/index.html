@@ -358,16 +358,15 @@
             const{jsPDF}=window.jspdf;const doc=new jsPDF();
             doc.setFont('helvetica','bold').setFontSize(14).text(CO.name,14,25);
             doc.setFontSize(8).setFont('helvetica','normal');
-            let y=30;
-            if(CO.reg&&CO.reg!=='YOUR_SSM_REG_NUMBER'){doc.text('Company Reg. No.: '+CO.reg,14,y);y+=4;}
-            const addr=doc.splitTextToSize(CO.address,100);doc.text(addr,14,y);y+=addr.length*4;
-            doc.text('Tel: '+CO.tel+' | Email: '+CO.email,14,y);y+=6;
-            doc.line(14,y,196,y);y+=10;
-            doc.setFontSize(12).setFont('helvetica','bold').text('CARBONEX - STAFF CLAIM FORM',14,y);
-            doc.setFontSize(10).text(`Ref No: ${data.claim_number}`,196,y,{align:'right'});y+=10;
-            doc.setFontSize(9).setFont('helvetica','normal').text(`Name: ${data.staff_name} (${data.staff_email})`,14,y);
-            doc.text(`Date: ${new Date(data.submission_date).toLocaleDateString('en-GB')}`,150,y);y+=5;
-            doc.autoTable({startY:y,head:[['NO.',"VENDOR'S COMPANY NAME",'AMOUNT (RM)','PROJECT NO.','REMARKS']],body:data.items.map((i,idx)=>[idx+1,(i.vendor||'').toUpperCase(),formatRM(i.amount),(i.project||'-').toUpperCase(),(i.remarks||'').toUpperCase()]),theme:'grid',headStyles:{fillColor:[240,240,240],textColor:[0,0,0]},styles:{fontSize:8}});
+            if(CO.reg&&CO.reg!=='YOUR_SSM_REG_NUMBER')doc.text('Reg No: '+CO.reg,14,30);
+            doc.text(doc.splitTextToSize(CO.address,100),14,34);
+            doc.text('Tel: '+CO.tel+' | Email: '+CO.email,14,42);
+            doc.line(14,45,196,45);
+            doc.setFontSize(12).setFont('helvetica','bold').text('CARBONEX — STAFF CLAIM FORM',14,55);
+            doc.setFontSize(10).text(`Ref No: ${data.claim_number}`,196,55,{align:'right'});
+            doc.setFontSize(9).text(`Name: ${data.staff_name} (${data.staff_email})`,14,65);
+            doc.text(`Date: ${new Date(data.submission_date).toLocaleDateString('en-GB')}`,150,65);
+            doc.autoTable({startY:70,head:[['NO.','VENDOR','AMOUNT (RM)','PROJECT NO.','REMARKS']],body:data.items.map((i,idx)=>[idx+1,(i.vendor||'').toUpperCase(),formatRM(i.amount),(i.project||'-').toUpperCase(),(i.remarks||'').toUpperCase()]),theme:'grid',headStyles:{fillColor:[240,240,240],textColor:[0,0,0]},styles:{fontSize:8}});
             const finalY=doc.lastAutoTable.finalY;
             doc.setFont('helvetica','bold').setFontSize(11).text(`Total: RM ${formatRM(data.total_amount)}`,196,finalY+10,{align:'right'});
             if(preview){
