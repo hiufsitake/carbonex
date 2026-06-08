@@ -4,7 +4,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0d1f0d">
+    <meta name="theme-color" content="#1e3a26">
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
@@ -20,9 +20,9 @@
         #app-loader { position: fixed; inset: 0; background: #fff; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s, visibility 0.5s; }
         #app-loader.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
         .input-box { border: 2px solid #f1f5f9; padding: 1rem; border-radius: 1.25rem; background: #f8fafc; font-weight: 700; width: 100%; outline: none; transition: all 0.2s; font-size: 16px; }
-        .input-box:focus { border-color: #2d6a27; background: white; }
+        .input-box:focus { border-color: #3f6f4a; background: white; }
         .nav-card { transition: all 0.2s cubic-bezier(0.4,0,0.2,1); border: 2px solid #f8fafc; background: #fff; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .nav-card:hover { border-color: #2d6a27; transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
+        .nav-card:hover { border-color: #3f6f4a; transform: translateY(-3px); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); }
         .nav-card:active { transform: scale(0.97); }
         .hidden-force { display: none !important; }
         #install-banner { padding-bottom: env(safe-area-inset-bottom); }
@@ -38,7 +38,7 @@
     <div class="w-full max-w-md space-y-10 text-center">
         <div class="flex flex-col items-center">
             <img src="logo.png" alt="Carbonex Ventures" class="w-64 sm:w-72 md:w-80 h-auto object-contain mb-4">
-            <div class="h-1 w-12 bg-[#2d6a27] rounded-full mb-2"></div>
+            <div class="h-1 w-12 bg-[#3f6f4a] rounded-full mb-2"></div>
             <p class="text-[11px] font-black uppercase tracking-[0.5em] text-slate-400">Operations Portal</p>
         </div>
 
@@ -51,12 +51,12 @@
                 <input type="email" id="email" placeholder="Email Address" class="input-box" required>
                 <input type="password" id="password" placeholder="Password" class="input-box" required>
                 <div id="forgot-link-box" class="text-right">
-                    <button onclick="toggleResetMode()" class="text-[10px] font-bold text-slate-400 hover:text-[#2d6a27] uppercase tracking-widest">Forgot Password?</button>
+                    <button onclick="toggleResetMode()" class="text-[10px] font-bold text-slate-400 hover:text-[#3f6f4a] uppercase tracking-widest">Forgot Password?</button>
                 </div>
             </div>
             <div class="flex flex-col gap-3">
-                <button onclick="handleAuth()" id="submit-btn" class="w-full bg-[#0d1f0d] text-white font-black p-5 rounded-[2rem] shadow-xl uppercase tracking-widest text-xs hover:bg-[#2d6a27] transition-all">Login</button>
-                <button onclick="toggleAuthMode()" id="toggle-btn" class="w-full bg-white border-2 border-slate-200 text-slate-900 font-black p-5 rounded-[2rem] uppercase tracking-widest text-[10px] hover:border-[#2d6a27] hover:text-[#2d6a27] transition-all shadow-sm">Create New Account</button>
+                <button onclick="handleAuth()" id="submit-btn" class="w-full bg-[#1e3a26] text-white font-black p-5 rounded-[2rem] shadow-xl uppercase tracking-widest text-xs hover:bg-[#3f6f4a] transition-all">Login</button>
+                <button onclick="toggleAuthMode()" id="toggle-btn" class="w-full bg-white border-2 border-slate-200 text-slate-900 font-black p-5 rounded-[2rem] uppercase tracking-widest text-[10px] hover:border-[#3f6f4a] hover:text-[#3f6f4a] transition-all shadow-sm">Create New Account</button>
             </div>
             <p id="error-msg" class="text-red-500 text-xs font-bold hidden bg-red-50 p-3 rounded-xl"></p>
         </div>
@@ -67,34 +67,34 @@
                 <p class="text-xs font-bold text-slate-400">Secure your account with a new password.</p>
             </div>
             <input type="password" id="new-password" placeholder="Enter New Password" class="input-box" required>
-            <button onclick="handlePasswordUpdate()" class="w-full bg-[#2d6a27] text-white font-black p-5 rounded-[2rem] shadow-xl uppercase tracking-widest text-xs hover:bg-[#1a4a18] transition-all">Update Password</button>
+            <button onclick="handlePasswordUpdate()" class="w-full bg-[#3f6f4a] text-white font-black p-5 rounded-[2rem] shadow-xl uppercase tracking-widest text-xs hover:bg-[#3f6f4a] transition-all">Update Password</button>
             <p id="update-msg" class="text-red-500 text-xs font-bold hidden bg-red-50 p-3 rounded-xl"></p>
         </div>
 
         <div id="dashboard-view" class="hidden space-y-6">
             <div class="grid grid-cols-2 gap-4">
                 <a href="po/index.html" class="nav-card p-5 rounded-[2rem] flex flex-col items-center gap-3 text-center">
-                    <div class="bg-[#2d6a27] text-white p-3 rounded-xl"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div>
+                    <div class="bg-[#3f6f4a] text-white p-3 rounded-xl"><i data-lucide="shopping-cart" class="w-5 h-5"></i></div>
                     <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">PO System</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Purchase Orders</p></div>
                 </a>
                 <a href="cashclaim/index.html" class="nav-card p-5 rounded-[2rem] flex flex-col items-center gap-3 text-center">
-                    <div class="bg-[#1a6b4a] text-white p-3 rounded-xl"><i data-lucide="wallet" class="w-5 h-5"></i></div>
+                    <div class="bg-[#2c5738] text-white p-3 rounded-xl"><i data-lucide="wallet" class="w-5 h-5"></i></div>
                     <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">Cash Claim</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Expense Claims</p></div>
                 </a>
                 <a href="staffclaim/index.html" class="nav-card p-5 rounded-[2rem] flex flex-col items-center gap-3 text-center">
-                    <div class="bg-[#4a7a2d] text-white p-3 rounded-xl"><i data-lucide="file-text" class="w-5 h-5"></i></div>
+                    <div class="bg-[#4f8a5b] text-white p-3 rounded-xl"><i data-lucide="file-text" class="w-5 h-5"></i></div>
                     <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">Staff Claim</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Reimbursements</p></div>
                 </a>
                 <a href="leave/index.html" class="nav-card p-5 rounded-[2rem] flex flex-col items-center gap-3 text-center">
-                    <div class="bg-[#1a4a1a] text-white p-3 rounded-xl"><i data-lucide="calendar" class="w-5 h-5"></i></div>
+                    <div class="bg-[#5f9169] text-white p-3 rounded-xl"><i data-lucide="calendar" class="w-5 h-5"></i></div>
                     <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">Leave System</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Leave Management</p></div>
                 </a>
                 <a href="accounting/index.html" class="nav-card col-span-2 p-5 rounded-[2rem] flex flex-row items-center gap-4 text-left">
-                    <div class="bg-[#0d3b6e] text-white p-3 rounded-xl flex-shrink-0"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></div>
+                    <div class="bg-[#6d7363] text-white p-3 rounded-xl flex-shrink-0"><i data-lucide="bar-chart-2" class="w-5 h-5"></i></div>
                     <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">Accounting</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Invoices · Delivery Orders · Vouchers · SST · Aging Report</p></div>
                 </a>
                 <a href="settings/index.html" class="nav-card col-span-2 p-5 rounded-[2rem] flex flex-row items-center gap-4 text-left">
-                    <div class="bg-slate-700 text-white p-3 rounded-xl flex-shrink-0"><i data-lucide="settings" class="w-5 h-5"></i></div>
+                    <div class="bg-[#5b6b56] text-white p-3 rounded-xl flex-shrink-0"><i data-lucide="settings" class="w-5 h-5"></i></div>
                     <div><h2 class="font-black uppercase italic text-slate-800 text-[10px] leading-tight">Settings</h2><p class="text-[8px] text-slate-400 font-bold mt-0.5">Staff Directory · Admin Management</p></div>
                 </a>
             </div>
@@ -104,7 +104,7 @@
         </div>
 
         <!-- PWA Install Banner -->
-        <div id="install-banner" class="hidden fixed bottom-0 left-0 right-0 z-40 bg-[#0d1f0d] text-white shadow-2xl">
+        <div id="install-banner" class="hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1e3a26] text-white shadow-2xl">
             <div class="flex items-center justify-between gap-3 px-5 py-4 max-w-md mx-auto">
                 <div class="flex items-center gap-3">
                     <img src="logo.png" class="w-10 h-10 object-contain flex-shrink-0" alt="">
@@ -115,7 +115,7 @@
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
                     <button onclick="dismissInstall()" class="text-[10px] font-bold text-gray-400 hover:text-white uppercase px-3 py-2 min-h-[44px]">Later</button>
-                    <button onclick="triggerInstall()" class="bg-[#2d6a27] hover:bg-[#3a8030] text-white font-black text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-xl min-h-[44px] transition-colors">Install</button>
+                    <button onclick="triggerInstall()" class="bg-[#3f6f4a] hover:bg-[#4f8a5b] text-white font-black text-[10px] uppercase tracking-wider px-4 py-2.5 rounded-xl min-h-[44px] transition-colors">Install</button>
                 </div>
             </div>
         </div>
@@ -132,19 +132,19 @@
                 </div>
                 <ol class="text-xs text-slate-700 font-bold space-y-3 mb-5">
                     <li class="flex items-start gap-3">
-                        <span class="bg-[#2d6a27] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">1</span>
+                        <span class="bg-[#3f6f4a] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">1</span>
                         <span>Tap the <strong>Share</strong> button <strong>(□↑)</strong> at the bottom of Safari</span>
                     </li>
                     <li class="flex items-start gap-3">
-                        <span class="bg-[#2d6a27] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">2</span>
+                        <span class="bg-[#3f6f4a] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">2</span>
                         <span>Scroll down and tap <strong>Add to Home Screen</strong></span>
                     </li>
                     <li class="flex items-start gap-3">
-                        <span class="bg-[#2d6a27] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">3</span>
+                        <span class="bg-[#3f6f4a] text-white rounded-full w-6 h-6 flex items-center justify-center font-black text-[10px] flex-shrink-0 mt-0.5">3</span>
                         <span>Tap <strong>Add</strong> to confirm</span>
                     </li>
                 </ol>
-                <button onclick="document.getElementById('ios-install-modal').classList.add('hidden')" class="w-full bg-[#0d1f0d] text-white font-black text-xs uppercase tracking-wider p-4 rounded-2xl min-h-[52px]">Got it</button>
+                <button onclick="document.getElementById('ios-install-modal').classList.add('hidden')" class="w-full bg-[#1e3a26] text-white font-black text-xs uppercase tracking-wider p-4 rounded-2xl min-h-[52px]">Got it</button>
             </div>
         </div>
 

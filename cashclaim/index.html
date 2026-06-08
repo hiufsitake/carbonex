@@ -4,7 +4,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0d1f0d">
+    <meta name="theme-color" content="#1e3a26">
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
@@ -29,8 +29,8 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body{font-family:'Inter',sans-serif;-webkit-tap-highlight-color:transparent;}
         .input-box{border:2px solid #f1f5f9;padding:1rem;border-radius:1.25rem;background:#f8fafc;font-weight:700;width:100%;outline:none;transition:all 0.2s;}
-        .input-box:focus{border-color:#1a6b4a;background:white;}
-        .tab-active{background:#1a6b4a;color:white;box-shadow:0 10px 15px -3px rgba(26,107,74,0.3);}
+        .input-box:focus{border-color:#3f6f4a;background:white;}
+        .tab-active{background:#3f6f4a;color:white;box-shadow:0 10px 15px -3px rgba(26,107,74,0.3);}
         .status-pending{background:#fef3c7;color:#92400e;}
         .status-approved{background:#dcfce7;color:#166534;}
         .status-rejected{background:#fee2e2;color:#991b1b;}
@@ -39,12 +39,12 @@
 </head>
 <body class="bg-slate-50 min-h-screen pb-24 text-slate-900 font-medium">
 
-    <nav class="bg-[#0d1f0d] text-white p-5 sticky top-0 z-50 shadow-xl border-b-2 border-[#1a6b4a]">
+    <nav class="bg-[#1e3a26] text-white p-5 sticky top-0 z-50 shadow-xl border-b-2 border-[#3f6f4a]">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <a href="../index.html" class="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-all"><i data-lucide="arrow-left" class="w-5 h-5"></i></a>
                 <div>
-                    <h1 class="font-black italic text-base uppercase tracking-tighter leading-none">CARBONEX <span class="text-[#3db87a] text-xs">Cash Claim</span></h1>
+                    <h1 class="font-black italic text-base uppercase tracking-tighter leading-none">CARBONEX <span class="text-[#86c191] text-xs">Cash Claim</span></h1>
                     <p class="text-[8px] text-slate-500 uppercase tracking-widest">Expense Reimbursement</p>
                 </div>
             </div>
@@ -93,16 +93,16 @@
                 <section class="bg-white p-6 rounded-[2rem] shadow-sm border space-y-4">
                     <div class="flex justify-between items-center">
                         <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 italic">Expenditure Items</h2>
-                        <button type="button" onclick="addItemRow()" class="bg-[#f0faf5] text-[#1a6b4a] px-4 py-2 rounded-xl font-black text-[10px] uppercase flex items-center gap-1 shadow-sm hover:bg-[#1a6b4a] hover:text-white transition-all"><i data-lucide="plus-circle" class="w-3 h-3"></i> Add Item</button>
+                        <button type="button" onclick="addItemRow()" class="bg-[#edf3ed] text-[#3f6f4a] px-4 py-2 rounded-xl font-black text-[10px] uppercase flex items-center gap-1 shadow-sm hover:bg-[#3f6f4a] hover:text-white transition-all"><i data-lucide="plus-circle" class="w-3 h-3"></i> Add Item</button>
                     </div>
                     <div id="items-list" class="space-y-3"></div>
                 </section>
 
                 <div class="flex gap-3">
-                    <button type="button" onclick="previewPDF()" class="w-1/3 bg-[#f0faf5] text-[#1a6b4a] border border-[#a7d9c0] font-black p-6 rounded-[2.5rem] shadow-sm uppercase tracking-widest text-[10px] italic flex flex-col md:flex-row items-center justify-center gap-2 hover:bg-[#1a6b4a] hover:text-white transition-all">
+                    <button type="button" onclick="previewPDF()" class="w-1/3 bg-[#edf3ed] text-[#3f6f4a] border border-[#86c191] font-black p-6 rounded-[2.5rem] shadow-sm uppercase tracking-widest text-[10px] italic flex flex-col md:flex-row items-center justify-center gap-2 hover:bg-[#3f6f4a] hover:text-white transition-all">
                         <i data-lucide="eye" class="w-5 h-5"></i> Preview
                     </button>
-                    <button type="submit" id="submit-btn" class="w-2/3 bg-[#0d1f0d] text-white font-black p-6 rounded-[2.5rem] shadow-xl uppercase tracking-widest text-xs italic flex flex-col md:flex-row items-center justify-center gap-3 hover:bg-[#1a6b4a] transition-all">
+                    <button type="submit" id="submit-btn" class="w-2/3 bg-[#1e3a26] text-white font-black p-6 rounded-[2.5rem] shadow-xl uppercase tracking-widest text-xs italic flex flex-col md:flex-row items-center justify-center gap-3 hover:bg-[#3f6f4a] transition-all">
                         <i data-lucide="send" class="w-5 h-5"></i> Submit Claim
                     </button>
                 </div>
@@ -117,8 +117,8 @@
         <div id="tab-history" class="hidden"><div id="history-list" class="space-y-3"></div></div>
         <div id="tab-admin" class="hidden">
             <section class="bg-white p-8 rounded-[2.5rem] border shadow-sm space-y-6 text-center">
-                <i data-lucide="settings" class="w-12 h-12 mx-auto text-[#1a6b4a]"></i>
-                <button onclick="exportCSV()" class="w-full bg-[#0d1f0d] text-white p-5 rounded-3xl font-black uppercase text-xs tracking-widest shadow-lg flex items-center justify-center gap-3 hover:bg-[#1a6b4a] transition-all"><i data-lucide="download" class="w-5 h-5"></i> Export All Claims (CSV)</button>
+                <i data-lucide="settings" class="w-12 h-12 mx-auto text-[#3f6f4a]"></i>
+                <button onclick="exportCSV()" class="w-full bg-[#1e3a26] text-white p-5 rounded-3xl font-black uppercase text-xs tracking-widest shadow-lg flex items-center justify-center gap-3 hover:bg-[#3f6f4a] transition-all"><i data-lucide="download" class="w-5 h-5"></i> Export All Claims (CSV)</button>
             </section>
         </div>
 
@@ -200,13 +200,13 @@
                         <div class="text-right">
                             <p class="text-[9px] font-bold text-slate-400 uppercase">Amount</p>
                             <p class="text-2xl font-black text-slate-900 leading-none">RM ${formatRM(cc.total_amount)}</p>
-                            <button onclick="generatePDF('${cc.id}')" class="mt-2 bg-[#f0faf5] text-[#1a6b4a] px-3 py-1.5 rounded-full font-bold text-[9px] uppercase flex items-center gap-1 ml-auto"><i data-lucide="eye" class="w-3 h-3"></i> View</button>
+                            <button onclick="generatePDF('${cc.id}')" class="mt-2 bg-[#edf3ed] text-[#3f6f4a] px-3 py-1.5 rounded-full font-bold text-[9px] uppercase flex items-center gap-1 ml-auto"><i data-lucide="eye" class="w-3 h-3"></i> View</button>
                         </div>
                     </div>
                     <textarea id="reason-${cc.id}" placeholder="Feedback (Optional)" class="w-full bg-slate-50 border border-slate-100 rounded-xl p-3 text-xs font-medium outline-none" rows="2"></textarea>
-                    <div class="bg-slate-50 px-4 py-2 rounded-xl text-[10px] font-bold text-center text-slate-700 uppercase tracking-widest">Action as <span class="text-[#1a6b4a]">${currentApproverInitials||'&mdash;'}</span></div>
+                    <div class="bg-slate-50 px-4 py-2 rounded-xl text-[10px] font-bold text-center text-slate-700 uppercase tracking-widest">Action as <span class="text-[#3f6f4a]">${currentApproverInitials||'&mdash;'}</span></div>
                     <div class="flex gap-3">
-                        <button onclick="handleStatusChange('${cc.id}','Approved')" class="flex-1 bg-[#1a6b4a] text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-[#0f4a32] transition-all">Approve</button>
+                        <button onclick="handleStatusChange('${cc.id}','Approved')" class="flex-1 bg-[#3f6f4a] text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-[#0f4a32] transition-all">Approve</button>
                         <button onclick="handleStatusChange('${cc.id}','Rejected')" class="flex-1 bg-red-500 text-white py-3 rounded-xl font-bold text-xs uppercase hover:bg-red-600 transition-all">Reject</button>
                     </div>
                 </div>`).join('')||'<div class="text-center p-10 text-slate-300 italic text-xs">Queue Clear</div>';
@@ -219,7 +219,7 @@
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
                         <span class="status-${cc.status.toLowerCase()} px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest">${cc.status}</span>
-                        ${cc.status==='Approved'?`<button onclick="generatePDF('${cc.id}')" class="p-2.5 bg-[#f0faf5] text-[#1a6b4a] rounded-xl"><i data-lucide="printer" class="w-4 h-4"></i></button>`:''}
+                        ${cc.status==='Approved'?`<button onclick="generatePDF('${cc.id}')" class="p-2.5 bg-[#edf3ed] text-[#3f6f4a] rounded-xl"><i data-lucide="printer" class="w-4 h-4"></i></button>`:''}
                         ${(cc.status==='Rejected'||cc.status==='Draft')?`<button onclick="loadClaimForEdit('${cc.id}')" class="p-2.5 bg-blue-50 text-blue-600 rounded-xl"><i data-lucide="edit-3" class="w-4 h-4"></i></button>`:''}
                         ${isAuthorized?`<button onclick="deleteClaim('${cc.id}')" class="p-2.5 bg-red-50 text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>`:''}
                     </div>
@@ -237,7 +237,7 @@
             const cc=currentClaims.find(c=>String(c.id)===String(id));
             const{error}=await supabaseClient.from('cash_claims').update({status:newStatus,approved_by:currentApproverInitials}).eq('id',id);
             if(error){alert('Database Error: '+error.message);return;}
-            if(cc){const color=newStatus==='Approved'?'#1a6b4a':'#ef4444';emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{system_name:'CARBONEX CASH CLAIM',header_bg:color,title:`Claim ${newStatus}`,to_email:cc.claimant_email,to_name:cc.claimant_name,html_body:mkRow('Claim No',cc.claim_number)+mkRow('Status',newStatus.toUpperCase())+mkRow('Action By',currentApproverInitials)+mkRow('Total','RM '+formatRM(cc.total_amount)),remark_text:document.getElementById('reason-'+id)?.value||(newStatus==='Approved'?'Claim approved.':'Claim rejected.')});}
+            if(cc){const color=newStatus==='Approved'?'#3f6f4a':'#ef4444';emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{system_name:'CARBONEX CASH CLAIM',header_bg:color,title:`Claim ${newStatus}`,to_email:cc.claimant_email,to_name:cc.claimant_name,html_body:mkRow('Claim No',cc.claim_number)+mkRow('Status',newStatus.toUpperCase())+mkRow('Action By',currentApproverInitials)+mkRow('Total','RM '+formatRM(cc.total_amount)),remark_text:document.getElementById('reason-'+id)?.value||(newStatus==='Approved'?'Claim approved.':'Claim rejected.')});}
             fetchRecords();
         }
 
@@ -361,7 +361,7 @@
             if(editingId)res=await supabaseClient.from('cash_claims').update(payload).eq('id',editingId);
             else res=await supabaseClient.from('cash_claims').insert(payload);
             if(!res.error){
-                emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{system_name:'CARBONEX CASH CLAIM',header_bg:'#0d1f0d',title:editingId?'Claim Resubmitted':'New Cash Claim',html_body:mkRow('Claim No',payload.claim_number)+mkRow('Claimant',payload.claimant_name)+mkRow('Total','RM '+formatRM(payload.total_amount)),remark_text:'Please review via CARBONEX Portal.'});
+                emailjs.send(EMAIL_SERVICE,EMAIL_TEMPLATE,{system_name:'CARBONEX CASH CLAIM',header_bg:'#1e3a26',title:editingId?'Claim Resubmitted':'New Cash Claim',html_body:mkRow('Claim No',payload.claim_number)+mkRow('Claimant',payload.claimant_name)+mkRow('Total','RM '+formatRM(payload.total_amount)),remark_text:'Please review via CARBONEX Portal.'});
                 alert(editingId?'Claim Updated.':'Claim Submitted.');cancelEdit();
                 if(isAuthorized)fetchRecords();
             }else alert('Error: '+res.error.message);

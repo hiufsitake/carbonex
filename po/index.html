@@ -77,7 +77,7 @@
         }
         
         .tab-active { 
-            background: #2d6a27; 
+            background: #3f6f4a; 
             color: white; 
             box-shadow: 0 4px 6px -1px rgba(45,106,39,0.2); 
         }
@@ -96,24 +96,22 @@
 
     <img id="pdf-logo" src="../carbonex letterhead.jpg" style="display:none;" crossorigin="anonymous">
 
-    <nav class="bg-white p-5 sticky top-0 z-50 shadow-sm border-b border-slate-100">
+    <nav class="bg-[#1e3a26] text-white p-5 sticky top-0 z-50 shadow-xl border-b-2 border-[#3f6f4a]">
         <div class="max-w-5xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <a href="../index.html" class="p-2 bg-slate-50 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-slate-700 transition-all">
+                <a href="../index.html" class="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-all">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 </a>
                 <div>
-                    <h1 class="font-black text-slate-800 text-sm uppercase tracking-tight leading-none">
-                        CARBONEX <span class="text-[#2d6a27]">PO</span>
-                    </h1>
-                    <p class="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">Purchasing</p>
+                    <h1 class="font-black italic text-base uppercase tracking-tighter leading-none">CARBONEX <span class="text-[#86c191] text-xs">PO System</span></h1>
+                    <p class="text-[8px] text-slate-500 uppercase tracking-widest">Purchase Order Management</p>
                 </div>
             </div>
-            <div class="flex bg-slate-50 p-1.5 rounded-2xl gap-1 overflow-x-auto border border-slate-100">
-                <button onclick="switchTab('create')" id="nav-create" class="px-4 py-2 rounded-xl text-[10px] font-bold tab-active uppercase transition-all tracking-widest">Create</button>
-                <button onclick="switchTab('review')" id="nav-review" class="px-4 py-2 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase transition-all tracking-widest">Review</button>
-                <button onclick="switchTab('history')" id="nav-history" class="px-4 py-2 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase transition-all tracking-widest">Archive</button>
-                <button onclick="switchTab('admin')" id="nav-admin" class="px-4 py-2 rounded-xl text-[10px] font-bold text-slate-400 hover:text-slate-600 uppercase transition-all tracking-widest hidden">Admin</button>
+            <div class="flex bg-slate-800 p-1 rounded-xl gap-1 overflow-x-auto">
+                <button onclick="switchTab('create')" id="nav-create" class="px-3 py-2 rounded-lg text-[9px] font-bold tab-active uppercase transition-all">Create</button>
+                <button onclick="switchTab('review')" id="nav-review" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all">Review</button>
+                <button onclick="switchTab('history')" id="nav-history" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all">Archive</button>
+                <button onclick="switchTab('admin')" id="nav-admin" class="px-3 py-2 rounded-lg text-[9px] font-bold text-slate-400 uppercase transition-all hidden">Admin</button>
             </div>
         </div>
     </nav>
@@ -136,7 +134,7 @@
                         <h2 class="font-black uppercase text-[10px] tracking-widest text-slate-400 mb-2">PO DETAILS</h2>
                         <input type="text" id="po-number" class="input-box text-slate-500 bg-slate-50 cursor-not-allowed" readonly placeholder="PO Number">
                         <input type="date" id="po-date" class="input-box" required>
-                        <input type="text" id="project-ref" placeholder="Project Number (Optional)" class="input-box focus:border-[#2d6a27]/30">
+                        <input type="text" id="project-ref" placeholder="Project Number (Optional)" class="input-box focus:border-[#3f6f4a]/30">
                         <input type="text" id="req-name" class="input-box text-slate-500 bg-slate-50 cursor-not-allowed" readonly placeholder="Requestor Name">
                         <input type="text" id="req-email" class="input-box text-slate-500 bg-slate-50 cursor-not-allowed" readonly placeholder="Requestor Email">
                     </section>
@@ -203,7 +201,7 @@
         <div id="tab-history" class="hidden space-y-4">
             <div class="relative">
                 <i data-lucide="search" class="w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" id="search-box" placeholder="Search PO Number or Supplier..." oninput="renderHistory()" class="input-box pl-10 bg-white border-slate-200 focus:border-[#2d6a27] shadow-sm">
+                <input type="text" id="search-box" placeholder="Search PO Number or Supplier..." oninput="renderHistory()" class="input-box pl-10 bg-white border-slate-200 focus:border-[#3f6f4a] shadow-sm">
             </div>
             <div id="history-list" class="space-y-3"></div>
         </div>
@@ -211,7 +209,7 @@
         <div id="tab-admin" class="hidden">
             <section class="bg-white p-10 rounded-[2rem] shadow-sm border border-slate-100 text-center space-y-6">
                 <div class="bg-slate-50 w-20 h-20 mx-auto rounded-full flex items-center justify-center">
-                    <i data-lucide="database" class="w-8 h-8 text-[#2d6a27]"></i>
+                    <i data-lucide="database" class="w-8 h-8 text-[#3f6f4a]"></i>
                 </div>
                 <div>
                     <h2 class="font-black uppercase text-sm tracking-tight text-slate-800">System Administration</h2>
@@ -449,7 +447,7 @@
             if (pendingPOs.length === 0) {
                 container.innerHTML = `
                     <div class="text-center py-20 px-6 bg-white rounded-[2rem] border border-slate-100 shadow-sm">
-                        <i data-lucide="check-circle-2" class="w-10 h-10 mx-auto text-[#2d6a27] mb-4 opacity-50"></i>
+                        <i data-lucide="check-circle-2" class="w-10 h-10 mx-auto text-[#3f6f4a] mb-4 opacity-50"></i>
                         <p class="text-xs font-black uppercase tracking-widest text-slate-400">All Caught Up</p>
                         <p class="text-[10px] font-bold text-slate-300 mt-1">No purchase orders await your review.</p>
                     </div>`;
@@ -461,7 +459,7 @@
                 <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 space-y-5">
                     <div class="flex justify-between items-start">
                         <div>
-                            <span class="inline-block px-2 py-1 bg-slate-50 rounded-lg text-[8px] font-black text-[#2d6a27] uppercase tracking-widest mb-2">${po.category || 'General'}</span>
+                            <span class="inline-block px-2 py-1 bg-slate-50 rounded-lg text-[8px] font-black text-[#3f6f4a] uppercase tracking-widest mb-2">${po.category || 'General'}</span>
                             <h3 class="font-black text-lg text-slate-900 tracking-tight leading-none">${po.po_number}</h3>
                             <p class="text-xs font-bold text-slate-500 mt-2">${po.supplier_name}</p>
                             ${po.project_ref ? `<p class="text-[10px] font-bold text-slate-400 mt-0.5">Ref: ${po.project_ref}</p>` : ''}
@@ -475,10 +473,10 @@
                         </div>
                     </div>
                     <div class="bg-slate-50 px-4 py-2 rounded-xl text-[9px] font-black text-slate-400 text-center uppercase tracking-widest border border-slate-100">
-                        Action Required by <span class="text-[#2d6a27]">${currentApproverInitials || '&mdash;'}</span>
+                        Action Required by <span class="text-[#3f6f4a]">${currentApproverInitials || '&mdash;'}</span>
                     </div>
                     <div class="flex gap-3">
-                        <button onclick="handleStatusChange('${po.id}','Approved')" class="flex-[2] bg-[#2d6a27] text-white py-4 rounded-[1rem] font-black text-xs uppercase tracking-widest hover:bg-[#1a4a18] transition-all flex justify-center items-center gap-2">
+                        <button onclick="handleStatusChange('${po.id}','Approved')" class="flex-[2] bg-[#3f6f4a] text-white py-4 rounded-[1rem] font-black text-xs uppercase tracking-widest hover:bg-[#3f6f4a] transition-all flex justify-center items-center gap-2">
                             <i data-lucide="check" class="w-4 h-4"></i> Approve
                         </button>
                         <button onclick="handleStatusChange('${po.id}','Rejected')" class="flex-1 bg-white text-red-500 border border-red-100 py-4 rounded-[1rem] font-black text-xs uppercase tracking-widest hover:bg-red-50 transition-all flex justify-center items-center gap-2">
@@ -521,7 +519,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 shrink-0">
-                        <button onclick="generatePDF('${po.id}')" class="p-3 bg-slate-50 text-slate-500 rounded-xl hover:bg-[#2d6a27] hover:text-white transition-all">
+                        <button onclick="generatePDF('${po.id}')" class="p-3 bg-slate-50 text-slate-500 rounded-xl hover:bg-[#3f6f4a] hover:text-white transition-all">
                             <i data-lucide="printer" class="w-4 h-4"></i>
                         </button>
                         ${(po.status === 'Rejected' || po.status === 'Draft') ? 
@@ -650,7 +648,7 @@
                 const isApproved = newStatus === 'Approved';
                 await triggerResendEmail(
                     `PO ${newStatus}`, 
-                    isApproved ? '#2d6a27' : '#ef4444', 
+                    isApproved ? '#3f6f4a' : '#ef4444', 
                     { ...po, approved_by: currentApproverInitials }, 
                     isApproved ? 'Purchase Order approved. Proceed with supplier.' : 'Purchase Order rejected. Please modify and resubmit.'
                 );

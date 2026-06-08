@@ -4,7 +4,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0d1f0d">
+    <meta name="theme-color" content="#1e3a26">
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -29,18 +29,18 @@
         *{box-sizing:border-box;}
         body{font-family:'Inter',sans-serif;margin:0;padding:0;background:#f8fafc;-webkit-tap-highlight-color:transparent;}
         #app{display:flex;height:100vh;overflow:hidden;}
-        #sidebar{width:220px;min-width:220px;background:#0d1f0d;display:flex;flex-direction:column;overflow-y:auto;transition:all 0.3s;}
-        .sb-brand{padding:18px 16px 14px;border-bottom:1px solid #1e3a1e;}
+        #sidebar{width:220px;min-width:220px;background:#1e3a26;display:flex;flex-direction:column;overflow-y:auto;transition:all 0.3s;}
+        .sb-brand{padding:18px 16px 14px;border-bottom:1px solid #1e3a26;}
         .sb-logo{height:28px;width:auto;object-fit:contain;}
         .sb-title{font-size:13px;font-weight:900;color:#fff;text-transform:uppercase;letter-spacing:0.05em;margin-top:6px;}
         .sb-sub{font-size:8px;color:#4a7a4a;text-transform:uppercase;letter-spacing:0.3em;margin-top:2px;font-weight:700;}
         .sb-section{padding:10px 8px 4px;}
         .sb-label{font-size:8px;font-weight:700;color:#2d5a2d;text-transform:uppercase;letter-spacing:0.2em;padding:0 8px 5px;}
         .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:10px;cursor:pointer;font-size:12px;font-weight:600;color:#6b9b6b;transition:all 0.15s;margin-bottom:1px;}
-        .nav-item:hover{background:#1e3a1e;color:#a8d5a8;}
-        .nav-item.active{background:#2d6a27;color:#fff;}
+        .nav-item:hover{background:#1e3a26;color:#a8d5a8;}
+        .nav-item.active{background:#3f6f4a;color:#fff;}
         .nav-item svg{width:14px;height:14px;flex-shrink:0;}
-        .sb-bottom{margin-top:auto;padding:10px;border-top:1px solid #1e3a1e;}
+        .sb-bottom{margin-top:auto;padding:10px;border-top:1px solid #1e3a26;}
         #main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
         #topbar{height:50px;background:#fff;border-bottom:2px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;}
         #page-title{font-size:12px;font-weight:900;color:#0f172a;text-transform:uppercase;letter-spacing:0.08em;}
@@ -66,9 +66,9 @@
         .b-draft,.b-credit{background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;}
         .btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:9999px;border:none;cursor:pointer;font-family:'Inter',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;transition:all 0.15s;white-space:nowrap;}
         .btn:active{transform:scale(0.97);}
-        .btn-dark{background:#0d1f0d;color:#fff;}.btn-dark:hover{background:#1e3a1e;}
-        .btn-green{background:#2d6a27;color:#fff;}.btn-green:hover{background:#1a4a18;}
-        .btn-out{background:transparent;color:#475569;border:2px solid #e2e8f0;}.btn-out:hover{border-color:#2d6a27;color:#2d6a27;}
+        .btn-dark{background:#1e3a26;color:#fff;}.btn-dark:hover{background:#1e3a26;}
+        .btn-green{background:#3f6f4a;color:#fff;}.btn-green:hover{background:#3f6f4a;}
+        .btn-out{background:transparent;color:#475569;border:2px solid #e2e8f0;}.btn-out:hover{border-color:#3f6f4a;color:#3f6f4a;}
         .btn-red{background:#ef4444;color:#fff;}.btn-red:hover{background:#dc2626;}
         .btn-sm{padding:5px 11px;font-size:10px;}
         .btn-xs{padding:3px 8px;font-size:9px;}
@@ -82,7 +82,7 @@
         .fg{margin-bottom:11px;}
         .fl{font-size:9px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:0.08em;display:block;margin-bottom:4px;}
         .fi{width:100%;padding:9px 11px;background:#f8fafc;border:2px solid #f1f5f9;border-radius:0.75rem;font-family:'Inter',sans-serif;font-size:13px;font-weight:500;color:#0f172a;outline:none;transition:all 0.15s;}
-        .fi:focus{border-color:#2d6a27;background:#fff;}
+        .fi:focus{border-color:#3f6f4a;background:#fff;}
         .fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
         .fr3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
         @media(max-width:768px){#sidebar{width:0;min-width:0;overflow:hidden;position:fixed;height:100%;z-index:200;}#sidebar.open{width:220px;min-width:220px;}.stat-grid{grid-template-columns:1fr 1fr;}}
@@ -117,7 +117,7 @@
             <div class="nav-item" onclick="switchModule('sst')" id="nav-sst"><i data-lucide="percent"></i><span>SST Summary</span></div>
         </div>
         <div class="sb-bottom">
-            <a href="../index.html" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:#6b9b6b;font-size:11px;font-weight:700;text-decoration:none;text-transform:uppercase;letter-spacing:0.05em;transition:background 0.15s" onmouseover="this.style.background='#1e3a1e'" onmouseout="this.style.background='transparent'">
+            <a href="../index.html" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;color:#6b9b6b;font-size:11px;font-weight:700;text-decoration:none;text-transform:uppercase;letter-spacing:0.05em;transition:background 0.15s" onmouseover="this.style.background='#1e3a26'" onmouseout="this.style.background='transparent'">
                 <i data-lucide="arrow-left" style="width:13px;height:13px"></i>Back to Portal
             </a>
         </div>
@@ -221,7 +221,7 @@ function badge(s) {
 function showToast(msg,type='success') {
     let t=document.getElementById('_toast');
     if(!t){t=document.createElement('div');t.id='_toast';document.body.appendChild(t);}
-    t.style.cssText=`position:fixed;bottom:24px;right:24px;z-index:9999;padding:11px 18px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:${type==='success'?'#2d6a27':'#ef4444'};box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:opacity 0.4s;opacity:1`;
+    t.style.cssText=`position:fixed;bottom:24px;right:24px;z-index:9999;padding:11px 18px;border-radius:12px;font-size:13px;font-weight:700;color:#fff;background:${type==='success'?'#3f6f4a':'#ef4444'};box-shadow:0 8px 24px rgba(0,0,0,0.2);transition:opacity 0.4s;opacity:1`;
     t.textContent=msg;
     clearTimeout(t._tid);
     t._tid=setTimeout(()=>t.style.opacity='0',3000);
@@ -257,13 +257,13 @@ async function renderDashboard() {
         <div class="tbl-wrap">
             <div class="tbl-head"><span class="tbl-title">Recent Invoices</span><button class="btn btn-dark btn-sm" onclick="switchModule('invoices')">View All</button></div>
             <table><thead><tr><th>Invoice No.</th><th>Total</th><th>Status</th></tr></thead><tbody>
-            ${invs.slice(0,6).map(i=>`<tr onclick="switchModule('invoices')"><td style="font-weight:700;color:#0d1f0d;font-size:11px">${esc(i.inv_number||'—')}</td><td style="font-size:11px;font-family:monospace">${fmtRM(i.total)}</td><td>${badge(i.status)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:18px;font-size:12px">No invoices yet</td></tr>'}
+            ${invs.slice(0,6).map(i=>`<tr onclick="switchModule('invoices')"><td style="font-weight:700;color:#1e3a26;font-size:11px">${esc(i.inv_number||'—')}</td><td style="font-size:11px;font-family:monospace">${fmtRM(i.total)}</td><td>${badge(i.status)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:18px;font-size:12px">No invoices yet</td></tr>'}
             </tbody></table>
         </div>
         <div class="tbl-wrap">
             <div class="tbl-head"><span class="tbl-title">Recent Vouchers</span><button class="btn btn-dark btn-sm" onclick="switchModule('vouchers')">View All</button></div>
             <table><thead><tr><th>PV No.</th><th>Payee</th><th>Amount</th></tr></thead><tbody>
-            ${pvs.slice(0,6).map(v=>`<tr onclick="switchModule('vouchers')"><td style="font-weight:700;color:#0d1f0d;font-size:11px">${esc(v.pv_number||'—')}</td><td style="font-size:11px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.payee||'—')}</td><td style="font-size:11px;font-family:monospace">${fmtRM(v.amount)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:18px;font-size:12px">No vouchers yet</td></tr>'}
+            ${pvs.slice(0,6).map(v=>`<tr onclick="switchModule('vouchers')"><td style="font-weight:700;color:#1e3a26;font-size:11px">${esc(v.pv_number||'—')}</td><td style="font-size:11px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(v.payee||'—')}</td><td style="font-size:11px;font-family:monospace">${fmtRM(v.amount)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;color:#94a3b8;padding:18px;font-size:12px">No vouchers yet</td></tr>'}
             </tbody></table>
         </div>
     </div>`;
@@ -340,7 +340,7 @@ async function renderInvoices() {
         <div class="tbl-head"><span class="tbl-title">Tax Invoices (${invs.length})</span><button class="btn btn-dark btn-sm" onclick="openInvoiceModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>New Invoice</button></div>
         <div style="overflow-x:auto"><table><thead><tr><th>Invoice No.</th><th>Customer</th><th>Date</th><th>Due</th><th>Subtotal</th><th>SST</th><th>Total</th><th>Status</th><th></th></tr></thead><tbody>
         ${invs.map(inv=>`<tr onclick="viewInvoice('${inv.id}')">
-            <td style="font-weight:700;color:#0d1f0d">${esc(inv.inv_number)}</td>
+            <td style="font-weight:700;color:#1e3a26">${esc(inv.inv_number)}</td>
             <td style="font-size:12px">${esc(cmap[inv.customer_id]||'—')}</td>
             <td style="color:#94a3b8;font-size:11px">${fmtDate(inv.date)}</td>
             <td style="color:${inv.status==='overdue'?'#ef4444':'#94a3b8'};font-size:11px">${fmtDate(inv.due_date)}</td>
@@ -508,7 +508,7 @@ async function renderDOs(){
         <div class="tbl-head"><span class="tbl-title">Delivery Orders (${dos.length})</span><button class="btn btn-dark btn-sm" onclick="openDOModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>New DO</button></div>
         <div style="overflow-x:auto"><table><thead><tr><th>DO No.</th><th>Customer</th><th>Date</th><th>Deliver To</th><th>Items</th><th>Status</th><th>Invoice Ref</th><th></th></tr></thead><tbody>
         ${dos.map(d=>`<tr>
-            <td style="font-weight:700;color:#0d1f0d">${esc(d.do_number)}</td>
+            <td style="font-weight:700;color:#1e3a26">${esc(d.do_number)}</td>
             <td>${esc(cmap[d.customer_id]||'—')}</td>
             <td style="color:#94a3b8;font-size:11px">${fmtDate(d.date)}</td>
             <td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(d.deliver_to||'—')}</td>
@@ -583,7 +583,7 @@ async function renderVouchers(){
         <div class="tbl-head"><span class="tbl-title">Payment Vouchers (${pvs.length})</span><button class="btn btn-dark btn-sm" onclick="openVoucherModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>New Voucher</button></div>
         <div style="overflow-x:auto"><table><thead><tr><th>PV No.</th><th>Payee</th><th>Date</th><th>Method</th><th>Amount</th><th>Status</th><th>Approved By</th><th></th></tr></thead><tbody>
         ${pvs.map(v=>`<tr>
-            <td style="font-weight:700;color:#0d1f0d">${esc(v.pv_number)}</td>
+            <td style="font-weight:700;color:#1e3a26">${esc(v.pv_number)}</td>
             <td style="font-weight:600;color:#0f172a">${esc(v.payee)}</td>
             <td style="color:#94a3b8;font-size:11px">${fmtDate(v.date)}</td>
             <td style="font-size:11px">${esc(v.payment_method||'—')}</td>
@@ -664,7 +664,7 @@ async function renderCreditNotes(){
         <div class="tbl-head"><span class="tbl-title">Credit / Debit Notes (${notes.length})</span><button class="btn btn-dark btn-sm" onclick="openCNModal()"><i data-lucide="plus" style="width:11px;height:11px"></i>New Note</button></div>
         <table><thead><tr><th>Note No.</th><th>Type</th><th>Customer</th><th>Date</th><th>Invoice Ref</th><th>Amount</th><th>Reason</th><th>Status</th><th></th></tr></thead><tbody>
         ${notes.map(n=>`<tr>
-            <td style="font-weight:700;color:#0d1f0d">${esc(n.cn_number)}</td>
+            <td style="font-weight:700;color:#1e3a26">${esc(n.cn_number)}</td>
             <td>${badge(n.type)}</td><td>${esc(cmap[n.customer_id]||'—')}</td>
             <td style="color:#94a3b8;font-size:11px">${fmtDate(n.date)}</td>
             <td style="font-family:monospace;font-size:11px">${esc(n.invoice_ref||'—')}</td>
@@ -727,7 +727,7 @@ async function renderAging(){
     ${buckets.map((b,bi)=>b.items.length?`<div class="tbl-wrap" style="margin-bottom:12px">
         <div class="tbl-head"><span class="tbl-title" style="color:${cols[bi]}">${b.l}</span></div>
         <table><thead><tr><th>Invoice No.</th><th>Customer</th><th>Date</th><th>Due</th><th>Days Overdue</th><th>Amount</th></tr></thead><tbody>
-        ${b.items.map(inv=>`<tr onclick="viewInvoice('${inv.id}')"><td style="font-weight:700;color:#0d1f0d">${esc(inv.inv_number)}</td><td>${esc(inv.cn)}</td><td style="color:#94a3b8;font-size:11px">${fmtDate(inv.date)}</td><td style="color:#ef4444;font-size:11px">${fmtDate(inv.due_date)}</td><td style="font-weight:700;color:${inv.days>60?'#ef4444':inv.days>30?'#f59e0b':'#10b981'}">${inv.days} days</td><td style="font-family:monospace;font-weight:700">${fmtRM(inv.total)}</td></tr>`).join('')}
+        ${b.items.map(inv=>`<tr onclick="viewInvoice('${inv.id}')"><td style="font-weight:700;color:#1e3a26">${esc(inv.inv_number)}</td><td>${esc(inv.cn)}</td><td style="color:#94a3b8;font-size:11px">${fmtDate(inv.date)}</td><td style="color:#ef4444;font-size:11px">${fmtDate(inv.due_date)}</td><td style="font-weight:700;color:${inv.days>60?'#ef4444':inv.days>30?'#f59e0b':'#10b981'}">${inv.days} days</td><td style="font-family:monospace;font-weight:700">${fmtRM(inv.total)}</td></tr>`).join('')}
         </tbody></table>
     </div>`:'').join('')||'<div style="text-align:center;padding:40px;color:#10b981;font-size:13px;font-weight:600">✓ No outstanding invoices!</div>'}`;
     lucide.createIcons();
@@ -750,7 +750,7 @@ async function renderSST(){
     <div class="tbl-wrap">
         <div class="tbl-head"><span class="tbl-title">Paid Invoices — SST Breakdown</span></div>
         <div style="overflow-x:auto"><table><thead><tr><th>Invoice No.</th><th>Date</th><th>Subtotal</th><th>S6 (6%)</th><th>ST10 (10%)</th><th>ST5 (5%)</th><th>Total SST</th><th>Invoice Total</th></tr></thead><tbody>
-        ${all.map(inv=>{let iS6=0,iST10=0,iST5=0;(inv.items||[]).forEach(it=>{const line=(it.qty||0)*(it.unit_price||0);if(it.sst_code==='S6')iS6+=line*0.06;if(it.sst_code==='ST10')iST10+=line*0.10;if(it.sst_code==='ST5')iST5+=line*0.05;});const tSST=iS6+iST10+iST5;return`<tr><td style="font-weight:700;color:#0d1f0d">${esc(inv.inv_number)}</td><td style="color:#94a3b8;font-size:11px">${fmtDate(inv.date)}</td><td style="font-family:monospace">${fmtRM(inv.subtotal)}</td><td style="font-family:monospace;color:#f59e0b">${iS6>0?fmtRM(iS6):'—'}</td><td style="font-family:monospace;color:#f59e0b">${iST10>0?fmtRM(iST10):'—'}</td><td style="font-family:monospace;color:#f59e0b">${iST5>0?fmtRM(iST5):'—'}</td><td style="font-family:monospace;font-weight:700;color:#f59e0b">${fmtRM(tSST)}</td><td style="font-family:monospace;font-weight:700">${fmtRM(inv.total)}</td></tr>`;}).join('')||'<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:28px;font-size:12px">No paid invoices yet.</td></tr>'}
+        ${all.map(inv=>{let iS6=0,iST10=0,iST5=0;(inv.items||[]).forEach(it=>{const line=(it.qty||0)*(it.unit_price||0);if(it.sst_code==='S6')iS6+=line*0.06;if(it.sst_code==='ST10')iST10+=line*0.10;if(it.sst_code==='ST5')iST5+=line*0.05;});const tSST=iS6+iST10+iST5;return`<tr><td style="font-weight:700;color:#1e3a26">${esc(inv.inv_number)}</td><td style="color:#94a3b8;font-size:11px">${fmtDate(inv.date)}</td><td style="font-family:monospace">${fmtRM(inv.subtotal)}</td><td style="font-family:monospace;color:#f59e0b">${iS6>0?fmtRM(iS6):'—'}</td><td style="font-family:monospace;color:#f59e0b">${iST10>0?fmtRM(iST10):'—'}</td><td style="font-family:monospace;color:#f59e0b">${iST5>0?fmtRM(iST5):'—'}</td><td style="font-family:monospace;font-weight:700;color:#f59e0b">${fmtRM(tSST)}</td><td style="font-family:monospace;font-weight:700">${fmtRM(inv.total)}</td></tr>`;}).join('')||'<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:28px;font-size:12px">No paid invoices yet.</td></tr>'}
         </tbody></table></div>
     </div>`;
     lucide.createIcons();

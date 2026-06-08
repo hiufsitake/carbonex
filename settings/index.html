@@ -4,7 +4,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#0d1f0d">
+    <meta name="theme-color" content="#1e3a26">
     <link rel="apple-touch-icon" href="../apple-touch-icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -31,19 +31,19 @@
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
         body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; padding-bottom: env(safe-area-inset-bottom); }
         .input-box { border: 2px solid #f1f5f9; padding: 1rem; border-radius: 1.25rem; background: #f8fafc; font-weight: 700; width: 100%; outline: none; transition: all 0.2s; font-size: 16px; }
-        .input-box:focus { border-color: #2d6a27; background: white; }
+        .input-box:focus { border-color: #3f6f4a; background: white; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-24">
 
-    <nav class="bg-[#0d1f0d] text-white p-5 sticky top-0 z-50 shadow-xl border-b-2 border-[#2d6a27]">
+    <nav class="bg-[#1e3a26] text-white p-5 sticky top-0 z-50 shadow-xl border-b-2 border-[#3f6f4a]">
         <div class="max-w-2xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-3">
                 <a href="../index.html" class="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition-all">
                     <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 </a>
                 <div>
-                    <h1 class="font-black italic text-base uppercase tracking-tighter leading-none">CARBONEX <span class="text-[#4a9e3f] text-xs">Settings</span></h1>
+                    <h1 class="font-black italic text-base uppercase tracking-tighter leading-none">CARBONEX <span class="text-[#86c191] text-xs">Settings</span></h1>
                     <p class="text-[8px] text-slate-500 uppercase tracking-widest">Staff Management</p>
                 </div>
             </div>
@@ -69,7 +69,7 @@
                         <label class="text-[9px] font-black uppercase text-slate-500 ml-2">Join Date (for leave calculations)</label>
                         <input type="date" id="staff-join" class="input-box" required>
                     </div>
-                    <button type="submit" id="add-btn" class="w-full bg-[#0d1f0d] hover:bg-[#2d6a27] text-white p-4 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-lg transition-colors flex items-center justify-center gap-2 min-h-[52px]">
+                    <button type="submit" id="add-btn" class="w-full bg-[#1e3a26] hover:bg-[#3f6f4a] text-white p-4 rounded-[1.5rem] font-black uppercase text-[10px] tracking-widest shadow-lg transition-colors flex items-center justify-center gap-2 min-h-[52px]">
                         <i data-lucide="user-plus" class="w-4 h-4"></i> Add to Database
                     </button>
                 </form>
@@ -89,7 +89,7 @@
 
         <!-- Toast -->
         <div id="toast" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 hidden">
-            <div id="toast-inner" class="px-5 py-3 rounded-2xl shadow-xl text-xs font-black uppercase tracking-widest text-white bg-[#0d1f0d]"></div>
+            <div id="toast-inner" class="px-5 py-3 rounded-2xl shadow-xl text-xs font-black uppercase tracking-widest text-white bg-[#1e3a26]"></div>
         </div>
 
         <footer class="text-center py-4 mt-6">
@@ -159,7 +159,7 @@
                 return `
                 <div class="bg-white p-4 rounded-2xl border border-slate-100 flex justify-between items-center shadow-sm hover:shadow-md transition-shadow">
                     <div class="flex items-center gap-3">
-                        <div class="bg-[#f0f7ee] text-[#2d6a27] p-2.5 rounded-xl">
+                        <div class="bg-[#edf3ed] text-[#3f6f4a] p-2.5 rounded-xl">
                             <i data-lucide="user" class="w-4 h-4"></i>
                         </div>
                         <div>
@@ -233,7 +233,7 @@
             const toast = document.getElementById('toast');
             const inner = document.getElementById('toast-inner');
             inner.textContent = msg;
-            inner.className = `px-5 py-3 rounded-2xl shadow-xl text-xs font-black uppercase tracking-widest text-white ${isError ? 'bg-red-500' : 'bg-[#2d6a27]'}`;
+            inner.className = `px-5 py-3 rounded-2xl shadow-xl text-xs font-black uppercase tracking-widest text-white ${isError ? 'bg-red-500' : 'bg-[#3f6f4a]'}`;
             toast.classList.remove('hidden');
             clearTimeout(toastTimeout);
             toastTimeout = setTimeout(() => toast.classList.add('hidden'), 3000);
