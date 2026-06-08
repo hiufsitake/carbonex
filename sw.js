@@ -1,25 +1,9 @@
-// CARBONEX Portal — minimal service worker (required for PWA installability)
-const CACHE = 'carbonex-v1';
-
-self.addEventListener('install', (e) => {
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', (e) => {
-  e.waitUntil(self.clients.claim());
-});
-
-// Network-first passthrough with cache fallback.
-// A fetch handler is required for Chrome to treat the app as installable.
+// CARBONEX Portal — service worker (required for PWA installability).
+// Network-only: always loads the freshest content, never serves stale cache.
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', (e) => {
-  if (e.request.method !== 'GET') return;
-  e.respondWith(
-    fetch(e.request)
-      .then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
-        return res;
-      })
-      .catch(() => caches.match(e.request))
-  );
+  // A fetch handler must exist for the app to be installable.
+  // Go straight to the network so updates are always picked up.
+  e.respondWith(fetch(e.request));
 });
